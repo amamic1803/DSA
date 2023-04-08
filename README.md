@@ -1,2 +1,3 @@
-# Algorithms
-A collection of various algorithms
+# Algorithms & Data Structures
+
+A collection of various algorithms and data structures.
