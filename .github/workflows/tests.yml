@@ -1,0 +1,32 @@
+name: Test and Lint
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+
+  horners-method-python:
+    name: Horner's method (Python)
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: bash
+        working-directory: "Horner's method/Python"
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Lint
+        uses: chartboost/ruff-action@v1
+
+      - name: Test
+        run: python3 -m unittest
