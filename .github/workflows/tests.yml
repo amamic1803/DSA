@@ -10,6 +10,35 @@ env:
 
 jobs:
 
+  collatz-conjecture-rust:
+    name: Collatz conjecture (Rust)
+    strategy:
+      matrix:
+        os: [ ubuntu-latest, macos-latest, windows-latest ]
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: bash
+        working-directory: "Collatz conjecture/Rust"
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Update Rust
+        run: rustup update
+
+      - name: Build
+        run: cargo build
+
+      - name: Test
+        run: cargo test
+
+      - name: Docs
+        run: cargo doc
+
+      - name: Clippy
+        run: cargo clippy -- -D warnings
+
   euclidean-algorithm-python:
     name: Euclidean algorithm (Python)
     strategy:
