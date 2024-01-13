@@ -121,6 +121,35 @@ jobs:
       - name: Test
         run: python3 -m unittest
 
+  sieve-of-atkin-rust:
+    name: Sieve of Atkin (Rust)
+    strategy:
+      matrix:
+        os: [ ubuntu-latest, macos-latest, windows-latest ]
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: bash
+        working-directory: "Sieve of Atkin/Rust"
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Update Rust
+        run: rustup update
+
+      - name: Build
+        run: cargo build
+
+      - name: Test
+        run: cargo test
+
+      - name: Docs
+        run: cargo doc
+
+      - name: Clippy
+        run: cargo clippy -- -D warnings
+
   trial-division-python:
     name: Trial division (Python)
     strategy:
