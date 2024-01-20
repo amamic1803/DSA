@@ -1,5 +1,5 @@
 import unittest
-from trial_division import trial_division
+from trial_division import trial_division, is_prime
 
 
 class TestTrialDivision(unittest.TestCase):
@@ -22,6 +22,12 @@ class TestTrialDivision(unittest.TestCase):
 	def test_5(self):
 		result = trial_division(39798123)
 		self.assertEqual(result, [3, 13266041])
+
+	def test_6(self):
+		for i in range(1, 10_001):
+			factors = trial_division(i)
+			primality = is_prime(i)
+			self.assertEqual(len(factors) == 1, primality)
 
 
 if __name__ == '__main__':

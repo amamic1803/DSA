@@ -1,3 +1,6 @@
+from math import isqrt
+
+
 def trial_division(n: int) -> list[int]:
 	"""Return a list of the prime factors for a natural number."""
 
@@ -18,6 +21,22 @@ def trial_division(n: int) -> list[int]:
 		factors.append(n)
 
 	return factors
+
+def is_prime(n: int) -> bool:
+	"""Return True if n is prime."""
+
+	if n <= 3:
+		return n > 1
+
+	if n % 2 == 0 or n % 3 == 0:
+		return False
+
+	limit = isqrt(n)
+	for i in range(5, limit + 1, 6):
+		if n % i == 0 or n % (i + 2) == 0:
+			return False
+
+	return True
 
 
 if __name__ == "__main__":
