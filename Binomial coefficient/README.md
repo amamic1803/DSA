@@ -1,25 +1,11 @@
 ## Binomial coefficient
 
 The **binomial coefficients** are the positive integers that occur as coefficients in the binomial theorem.
-Commonly, a binomial coefficient is indexed by a pair of integers n ≥ k ≥ 0 and is written ( n k ).
-$\tbinom {n}{k}$ It is the coefficient of the xk term in the polynomial expansion of the binomial power (1 + x)n; this coefficient can be computed by the multiplicative formula
+Commonly, a binomial coefficient is indexed by a pair of integers n ≥ k ≥ 0 and is written $\binom {n}{k}$.
+It can be calculated as $\binom {n}{k}={\frac {n!}{k!(n-k)!}}$.
 
-    ( n k ) = n × ( n − 1 ) × ⋯ × ( n − k + 1 ) k × ( k − 1 ) × ⋯ × 1 , {\displaystyle {\binom {n}{k}}={\frac {n\times (n-1)\times \cdots \times (n-k+1)}{k\times (k-1)\times \cdots \times 1}},}
+Arranging the numbers $\binom {n}{0}$, $\binom {n}{1}$, $\ldots$ , $\binom {n}{n}$ in successive rows for n = 0, 1, 2, ... gives a triangular array called Pascal's triangle,
+satisfying the recurrence relation $\binom {n}{k}={\binom {n-1}{k-1}}+{\binom {n-1}{k}}$.
 
-which using factorial notation can be compactly expressed as
-
-    ( n k ) = n ! k ! ( n − k ) ! . {\displaystyle {\binom {n}{k}}={\frac {n!}{k!(n-k)!}}.}
-
-For example, the fourth power of 1 + x is
-
-    ( 1 + x ) 4 = ( 4 0 ) x 0 + ( 4 1 ) x 1 + ( 4 2 ) x 2 + ( 4 3 ) x 3 + ( 4 4 ) x 4 = 1 + 4 x + 6 x 2 + 4 x 3 + x 4 , {\displaystyle {\begin{aligned}(1+x)^{4}&={\tbinom {4}{0}}x^{0}+{\tbinom {4}{1}}x^{1}+{\tbinom {4}{2}}x^{2}+{\tbinom {4}{3}}x^{3}+{\tbinom {4}{4}}x^{4}\\&=1+4x+6x^{2}+4x^{3}+x^{4},\end{aligned}}}
-
-and the binomial coefficient ( 4 2 ) = 4 × 3 2 × 1 = 4 ! 2 ! 2 ! = 6 {\displaystyle {\tbinom {4}{2}}={\tfrac {4\times 3}{2\times 1}}={\tfrac {4!}{2!2!}}=6} is the coefficient of the x2 term.
-
-Arranging the numbers ( n 0 ) , ( n 1 ) , … , ( n n ) {\displaystyle {\tbinom {n}{0}},{\tbinom {n}{1}},\ldots ,{\tbinom {n}{n}}} in successive rows for n = 0, 1, 2, ... gives a triangular array called Pascal's triangle, satisfying the recurrence relation
-
-    ( n k ) = ( n − 1 k − 1 ) + ( n − 1 k ) . {\displaystyle {\binom {n}{k}}={\binom {n-1}{k-1}}+{\binom {n-1}{k}}.}
-
-The binomial coefficients occur in many areas of mathematics, and especially in combinatorics. The symbol ( n k ) {\displaystyle {\tbinom {n}{k}}} is usually read as "n choose k" because there are ( n k ) {\displaystyle {\tbinom {n}{k}}} ways to choose an (unordered) subset of k elements from a fixed set of n elements. For example, there are ( 4 2 ) = 6 {\displaystyle {\tbinom {4}{2}}=6} ways to choose 2 elements from {1, 2, 3, 4}, namely {1, 2}, {1, 3}, {1, 4}, {2, 3}, {2, 4} and {3, 4}.
-
-The binomial coefficients can be generalized to ( z k ) {\displaystyle {\tbinom {z}{k}}} for any complex number z and integer k ≥ 0, and many of their properties continue to hold in this more general form. 
+The binomial coefficients occur in many areas of mathematics, and especially in combinatorics. The symbol $\binom {n}{k}$ is usually read as "n choose k" because there are $\binom {n}{k}$ ways to choose an (unordered) subset of k elements from a fixed set of n elements.
+For example, there are $\binom {4}{2}=6$ ways to choose 2 elements from {1, 2, 3, 4}, namely {1, 2}, {1, 3}, {1, 4}, {2, 3}, {2, 4} and {3, 4}.
