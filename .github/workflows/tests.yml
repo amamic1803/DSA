@@ -9,17 +9,12 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-
-  binomial-coefficient-python:
-    name: Binomial coefficient (Python)
-    strategy:
-      matrix:
-        os: [ ubuntu-latest, macos-latest, windows-latest ]
-    runs-on: ${{ matrix.os }}
+  test-and-lint:
+    name: Test and Lint
+    runs-on: ubuntu-latest
     defaults:
       run:
         shell: bash
-        working-directory: "Binomial coefficient/Python"
 
     steps:
       - name: Checkout repository
@@ -30,203 +25,11 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Lint
-        uses: chartboost/ruff-action@v1
+      - name: Setup Ruff
+        run: pip install ruff
 
-      - name: Test
-        run: python3 -m unittest
-
-  collatz-conjecture-rust:
-    name: Collatz conjecture (Rust)
-    strategy:
-      matrix:
-        os: [ ubuntu-latest, macos-latest, windows-latest ]
-    runs-on: ${{ matrix.os }}
-    defaults:
-      run:
-        shell: bash
-        working-directory: "Collatz conjecture/Rust"
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Update Rust
+      - name: Setup Rust
         run: rustup update
 
-      - name: Build
-        run: cargo build
-
-      - name: Test
-        run: cargo test
-
-      - name: Docs
-        run: cargo doc
-
-      - name: Clippy
-        run: cargo clippy -- -D warnings
-
-  euclidean-algorithm-python:
-    name: Euclidean algorithm (Python)
-    strategy:
-      matrix:
-        os: [ ubuntu-latest, macos-latest, windows-latest ]
-    runs-on: ${{ matrix.os }}
-    defaults:
-      run:
-        shell: bash
-        working-directory: "Euclidean algorithm/Python"
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-
-      - name: Lint
-        uses: chartboost/ruff-action@v1
-
-      - name: Test
-        run: python3 -m unittest
-
-  fast-inverse-square-root-rust:
-    name: Fast inverse square root (Rust)
-    strategy:
-      matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
-    runs-on: ${{ matrix.os }}
-    defaults:
-      run:
-        shell: bash
-        working-directory: "Fast inverse square root/Rust"
-
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
-
-    - name: Update Rust
-      run: rustup update
-
-    - name: Build
-      run: cargo build
-
-    - name: Test
-      run: cargo test
-
-    - name: Docs
-      run: cargo doc --all-features
-
-    - name: Clippy
-      run: cargo clippy --all-features -- -D warnings
-
-  horners-method-python:
-    name: Horner's method (Python)
-    strategy:
-      matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
-    runs-on: ${{ matrix.os }}
-    defaults:
-      run:
-        shell: bash
-        working-directory: "Horner's method/Python"
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-
-      - name: Lint
-        uses: chartboost/ruff-action@v1
-
-      - name: Test
-        run: python3 -m unittest
-
-  sieve-of-atkin-rust:
-    name: Sieve of Atkin (Rust)
-    strategy:
-      matrix:
-        os: [ ubuntu-latest, macos-latest, windows-latest ]
-    runs-on: ${{ matrix.os }}
-    defaults:
-      run:
-        shell: bash
-        working-directory: "Sieve of Atkin/Rust"
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Update Rust
-        run: rustup update
-
-      - name: Build
-        run: cargo build
-
-      - name: Test
-        run: cargo test
-
-      - name: Docs
-        run: cargo doc
-
-      - name: Clippy
-        run: cargo clippy -- -D warnings
-
-  sieve-of-eratosthenes-rust:
-    name: Sieve of Eratosthenes (Rust)
-    strategy:
-      matrix:
-        os: [ ubuntu-latest, macos-latest, windows-latest ]
-    runs-on: ${{ matrix.os }}
-    defaults:
-      run:
-        shell: bash
-        working-directory: "Sieve of Eratosthenes/Rust"
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Update Rust
-        run: rustup update
-
-      - name: Build
-        run: cargo build
-
-      - name: Test
-        run: cargo test
-
-      - name: Docs
-        run: cargo doc
-
-      - name: Clippy
-        run: cargo clippy -- -D warnings
-
-  trial-division-python:
-    name: Trial division (Python)
-    strategy:
-      matrix:
-        os: [ ubuntu-latest, macos-latest, windows-latest ]
-    runs-on: ${{ matrix.os }}
-    defaults:
-      run:
-        shell: bash
-        working-directory: "Trial division/Python"
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-
-      - name: Lint
-        uses: chartboost/ruff-action@v1
-
-      - name: Test
-        run: python3 -m unittest
+      - name: Run tests
+        run: ./test.sh
