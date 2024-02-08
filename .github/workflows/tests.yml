@@ -32,4 +32,6 @@ jobs:
         run: rustup update
 
       - name: Run tests
-        run: ./test.sh
+        run: |
+          chmod +x test.sh
+          ./test.sh
