@@ -1,7 +1,5 @@
 use sieve_of_atkin::sieve_of_atkin;
 
-
-
 #[test]
 fn primes_100() {
     assert_eq!(sieve_of_atkin(100).len(), 25);

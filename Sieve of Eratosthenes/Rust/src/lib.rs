@@ -14,8 +14,8 @@ pub fn sieve_of_eratosthenes(n: u64) -> Vec<u64> {
             let mut results = vec![2];
             let mut sieve = vec![true; (n - 1) as usize / 2];
 
-            let ind_to_val = |i: usize| ((i as u64) << 1) + 3;  // calculate number value from index in sieve
-            let val_to_ind = |v: u64| ((v - 3) >> 1) as usize;  // calculate index in sieve from number value
+            let ind_to_val = |i: usize| ((i as u64) << 1) + 3; // calculate number value from index in sieve
+            let val_to_ind = |v: u64| ((v - 3) >> 1) as usize; // calculate index in sieve from number value
 
             for prime_ind in 0..sieve.len() {
                 if sieve[prime_ind] {
@@ -26,7 +26,9 @@ pub fn sieve_of_eratosthenes(n: u64) -> Vec<u64> {
                     // start checking at prime_val^2 (all smaller multiples have already been checked by smaller primes)
                     let mut check_val = prime_val * prime_val;
                     let mut check_ind = val_to_ind(check_val);
-                    if check_ind >= sieve.len() { break; }
+                    if check_ind >= sieve.len() {
+                        break;
+                    }
 
                     while check_ind < sieve.len() {
                         sieve[check_ind] = false;
@@ -39,10 +41,16 @@ pub fn sieve_of_eratosthenes(n: u64) -> Vec<u64> {
             }
 
             // convert sieve indices that are true to their corresponding number values and add them to results
-            results.extend(sieve.into_iter().enumerate().filter_map(|(i, prime)| if prime { Some(ind_to_val(i)) } else { None }));
+            results.extend(sieve.into_iter().enumerate().filter_map(|(i, prime)| {
+                if prime {
+                    Some(ind_to_val(i))
+                } else {
+                    None
+                }
+            }));
 
             // return results
             results
-        },
+        }
     }
 }

@@ -1,7 +1,5 @@
 use sieve_of_eratosthenes::sieve_of_eratosthenes;
 
-
-
 #[test]
 fn primes_100() {
     assert_eq!(sieve_of_eratosthenes(100).len(), 25);

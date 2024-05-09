@@ -1,6 +1,5 @@
 #!/bin/bash
 
-
 printf "Running tests...\n\n"
 
 declare -i success=0
@@ -18,10 +17,10 @@ do
       cd "$language" || exit 1
       case "$language" in
         "Python")
-          ruff check . > /dev/null 2>&1
+          output=$(ruff check . 2>&1)
           exit_code=$?
           if [ "$exit_code" -eq 0 ]; then
-            python -m unittest > /dev/null 2>&1
+            output=$(python -m unittest 2>&1)
             exit_code=$?
           fi
           if [ "$exit_code" -eq 0 ]; then
@@ -29,18 +28,23 @@ do
             success+=1
           else
             printf "\033[31mFAIL\033[0m\n"
+            printf "%s\n" "$output"
             fail+=1
           fi
           ;;
         "Rust")
-          cargo build > /dev/null 2>&1
+          output=$(cargo clippy -- -D warnings 2>&1)
           exit_code=$?
           if [ "$exit_code" -eq 0 ]; then
-            cargo clippy -- -D warnings > /dev/null 2>&1
+            output=$(cargo fmt --all -- --check 2>&1)
             exit_code=$?
           fi
           if [ "$exit_code" -eq 0 ]; then
-            cargo test > /dev/null 2>&1
+            output=$(cargo build 2>&1)
+            exit_code=$?
+          fi
+          if [ "$exit_code" -eq 0 ]; then
+            output=$(cargo test 2>&1)
             exit_code=$?
           fi
           if [ "$exit_code" -eq 0 ]; then
@@ -48,6 +52,7 @@ do
             success+=1
           else
             printf "\033[31mFAIL\033[0m\n"
+            printf "%s\n" "$output"
             fail+=1
           fi
           ;;

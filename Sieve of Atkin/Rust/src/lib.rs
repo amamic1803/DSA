@@ -1,8 +1,12 @@
 pub fn sieve_of_atkin(limit: usize) -> Vec<usize> {
     let mut sieve = vec![false; limit + 1];
 
-    if limit >= 2 { sieve[2] = true; }
-    if limit >= 3 { sieve[3] = true; }
+    if limit >= 2 {
+        sieve[2] = true;
+    }
+    if limit >= 3 {
+        sieve[3] = true;
+    }
 
     let mut n;
     let root = (limit as f64).sqrt().floor() as usize;
@@ -18,7 +22,7 @@ pub fn sieve_of_atkin(limit: usize) -> Vec<usize> {
                 sieve[n] ^= true;
             }
 
-            n = (3 * x * x).saturating_sub(y * y);  // avoid underflow (0 % 12 != 11)
+            n = (3 * x * x).saturating_sub(y * y); // avoid underflow (0 % 12 != 11)
             if x > y && n <= limit && n % 12 == 11 {
                 sieve[n] ^= true;
             }
