@@ -2,7 +2,7 @@ import unittest
 from chinese_remainder_theorem import chinese_remainder_theorem
 
 
-class TestEuclideanAlgorithm(unittest.TestCase):
+class TestChineseRemainderTheorem(unittest.TestCase):
 	def test_1(self):
 		congruences = [(2, 3), (3, 5), (2, 7)]
 		self.assertEqual(chinese_remainder_theorem(congruences), 23)

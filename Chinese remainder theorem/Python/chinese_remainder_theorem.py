@@ -1,8 +1,7 @@
-from typing import List, Tuple
 import math
 
 
-def chinese_remainder_theorem(congruences: List[Tuple[int, int]]) -> int:
+def chinese_remainder_theorem(congruences: list[tuple[int, int]]) -> int:
 	"""
 	Find the solution to a system of congruences using the Chinese Remainder Theorem.
 	For a system of congruences:
@@ -20,7 +19,7 @@ def chinese_remainder_theorem(congruences: List[Tuple[int, int]]) -> int:
 	# sort by modulus in descending order
 	congruences.sort(key=lambda x: x[1], reverse=True)
 
-	# check if the congruences are pairwise coprime
+	# check if the moduli are pairwise coprime
 	for i in range(len(congruences)):
 		for j in range(i + 1, len(congruences)):
 			if math.gcd(congruences[i][1], congruences[j][1]) != 1:
