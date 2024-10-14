@@ -15,7 +15,7 @@ def main():
         print(f"#{i + 1:02d} {algorithm}")
         for (j, language) in enumerate(filter(lambda x: os.path.isdir(os.path.join(algorithm, x)) and x not in ignored_dirs, os.listdir(algorithm))):
             print(f"    {chr(ord('a') + j)}) {language.ljust(10)} ... ", end="")
-
+            path = os.path.join(algorithm, language)
             match language:
                 case "C":
                     if not run_test(os.path.join(algorithm, language), [
@@ -31,34 +31,34 @@ def main():
                     ]):
                         failed += 1
                         continue
-                    if not run_test(os.path.join(algorithm, language), ["cmake", "--build", "build"]):
+                    if not run_test(path, ["cmake", "--build", "build"]):
                         failed += 1
                         continue
-                    if not run_test(os.path.join(algorithm, language, "build"), ["ctest"]):
+                    if not run_test(os.path.join(path, "build"), ["ctest"]):
                         failed += 1
                         continue
                     print("OK")
                     succeeded += 1
                 case "Python":
-                    if not run_test(os.path.join(algorithm, language), ["ruff", "check", "."]):
+                    if not run_test(path, ["ruff", "check", "."]):
                         failed += 1
                         continue
-                    if not run_test(os.path.join(algorithm, language), ["python", "-m", "unittest"]):
+                    if not run_test(path, ["python", "-m", "unittest"]):
                         failed += 1
                         continue
                     print("OK")
                     succeeded += 1
                 case "Rust":
-                    if not run_test(os.path.join(algorithm, language), ["cargo", "clippy", "--", "-D", "warnings"]):
+                    if not run_test(path, ["cargo", "clippy", "--", "-D", "warnings"]):
                         failed += 1
                         continue
-                    if not run_test(os.path.join(algorithm, language), ["cargo", "fmt", "--all", "--", "--check"]):
+                    if not run_test(path, ["cargo", "fmt", "--all", "--", "--check"]):
                         failed += 1
                         continue
-                    if not run_test(os.path.join(algorithm, language), ["cargo", "build"]):
+                    if not run_test(path, ["cargo", "build"]):
                         failed += 1
                         continue
-                    if not run_test(os.path.join(algorithm, language), ["cargo", "test"]):
+                    if not run_test(path, ["cargo", "test"]):
                         failed += 1
                         continue
                     print("OK")
