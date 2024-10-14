@@ -26,6 +26,9 @@ jobs:
           version: latest
           platform: x64
 
+      - name: Check GCC version
+        run: gcc --version
+
       - name: Setup Ninja
         run: |
           sudo apt update
