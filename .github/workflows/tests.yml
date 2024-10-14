@@ -34,5 +34,10 @@ jobs:
       - name: Setup Ruff
         run: pip install ruff
 
+      - name: Setup Ninja
+        run: |
+          sudo apt update
+          sudo apt install -y ninja-build
+
       - name: Run tests
         run: python ./test.py
