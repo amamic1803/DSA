@@ -20,10 +20,13 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.13'
+      - name: Setup GCC
+        uses: johelegp/gcc-snapshot@v1
+
+      - name: Setup Ninja
+        run: |
+          sudo apt update
+          sudo apt install -y ninja-build
 
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@master
@@ -31,13 +34,13 @@ jobs:
           toolchain: stable
           components: clippy, rustfmt
 
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
       - name: Setup Ruff
         run: pip install ruff
-
-      - name: Setup Ninja
-        run: |
-          sudo apt update
-          sudo apt install -y ninja-build
 
       - name: Run tests
         run: python ./test.py
