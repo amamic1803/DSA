@@ -20,13 +20,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup GCC
-        run: |
-          sudo update-alternatives --display gcc
-          sudo update-alternatives --display g++
-          sudo update-alternatives --set gcc /usr/bin/gcc-14
-          sudo update-alternatives --set g++ /usr/bin/g++-14
-
       - name: Check GCC version
         run: gcc --version
 
