@@ -22,10 +22,10 @@ jobs:
 
       - name: Setup GCC
         run: |
-          sudo apt update
-          sudo apt install -y gcc g++
-          sudo update-alternatives --set gcc /usr/bin/gcc
-          sudo update-alternatives --set g++ /usr/bin/g++
+          sudo update-alternatives --display gcc
+          sudo update-alternatives --display g++
+          sudo update-alternatives --set gcc /usr/bin/gcc-14
+          sudo update-alternatives --set g++ /usr/bin/g++-14
 
       - name: Check GCC version
         run: gcc --version
