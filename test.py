@@ -15,6 +15,7 @@ def main():
         print(f"#{i + 1:02d} {algorithm}")
         for (j, language) in enumerate(filter(lambda x: os.path.isdir(os.path.join(algorithm, x)) and x not in ignored_dirs, os.listdir(algorithm))):
             print(f"    {chr(ord('a') + j)}) {language.ljust(10)} ... ", end="")
+            sys.stdout.flush()
             path = os.path.join(algorithm, language)
             match language:
                 case "C":
