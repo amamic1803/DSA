@@ -19,7 +19,7 @@ def main():
             path = os.path.join(algorithm, language)
             match language:
                 case "C":
-                    if not run_test(os.path.join(algorithm, language), [
+                    if not run_test(algorithm, language, os.path.join(algorithm, language), [
                         "cmake",
                         "-DCMAKE_C_COMPILER=gcc",
                         "-DCMAKE_CXX_COMPILER=g++",
@@ -32,34 +32,34 @@ def main():
                     ]):
                         failed += 1
                         continue
-                    if not run_test(path, ["cmake", "--build", "build"]):
+                    if not run_test(algorithm, language, path, ["cmake", "--build", "build"]):
                         failed += 1
                         continue
-                    if not run_test(os.path.join(path, "build"), ["ctest"]):
+                    if not run_test(algorithm, language, os.path.join(path, "build"), ["ctest"]):
                         failed += 1
                         continue
                     print("OK")
                     succeeded += 1
                 case "Python":
-                    if not run_test(path, ["ruff", "check", "."]):
+                    if not run_test(algorithm, language, path, ["ruff", "check", "."]):
                         failed += 1
                         continue
-                    if not run_test(path, ["python", "-m", "unittest"]):
+                    if not run_test(algorithm, language, path, ["python", "-m", "unittest"]):
                         failed += 1
                         continue
                     print("OK")
                     succeeded += 1
                 case "Rust":
-                    if not run_test(path, ["cargo", "clippy", "--", "-D", "warnings"]):
+                    if not run_test(algorithm, language, path, ["cargo", "clippy", "--", "-D", "warnings"]):
                         failed += 1
                         continue
-                    if not run_test(path, ["cargo", "fmt", "--all", "--", "--check"]):
+                    if not run_test(algorithm, language, path, ["cargo", "fmt", "--all", "--", "--check"]):
                         failed += 1
                         continue
-                    if not run_test(path, ["cargo", "build"]):
+                    if not run_test(algorithm, language, path, ["cargo", "build"]):
                         failed += 1
                         continue
-                    if not run_test(path, ["cargo", "test"]):
+                    if not run_test(algorithm, language, path, ["cargo", "test"]):
                         failed += 1
                         continue
                     print("OK")
@@ -75,7 +75,7 @@ def main():
     if failed > 0:
         sys.exit(1)
 
-def run_test(path, args) -> bool:
+def run_test(algorithm, language, path, args) -> bool:
     ret = subprocess.run(
         args,
         cwd=path,
@@ -83,13 +83,15 @@ def run_test(path, args) -> bool:
     )
     if ret.returncode != 0:
         print("FAIL")
-        print(f"       COMMAND: {" ".join(ret.args)}")
-        print("       STDOUT:")
+        print(f"### {algorithm}/{language}", file=sys.stderr)
+        print(f"COMMAND: {" ".join(ret.args)}", file=sys.stderr)
+        print("STDOUT:", file=sys.stderr)
         for line in ret.stdout.decode("utf-8").replace("\r", "").split("\n"):
-            print(f"           {line}")
-        print("       STDERR:")
+            print(f"    {line}", file=sys.stderr)
+        print("STDERR:", file=sys.stderr)
         for line in ret.stderr.decode("utf-8").replace("\r", "").split("\n"):
-            print(f"           {line}")
+            print(f"    {line}", file=sys.stderr)
+        print("\n\n", file=sys.stderr)
     return ret.returncode == 0
 
 def get_ignored_dirs() -> list[str]:
