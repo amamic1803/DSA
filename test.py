@@ -18,7 +18,7 @@ def main():
             sys.stdout.flush()
             path = os.path.join(algorithm, language)
             match language:
-                case "C":
+                case "C" | "C++":
                     if not run_test(algorithm, language, os.path.join(algorithm, language), [
                         "cmake",
                         "-DCMAKE_C_COMPILER=gcc",
