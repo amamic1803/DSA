@@ -38,34 +38,34 @@ int main(const int argc, char *argv[]) {
     bool test_result;
     switch (problem_number) {
         case 1:
-            test_result = test_p0001();
+            test_result = test01();
             break;
         case 2:
-            test_result = test_p0002();
+            test_result = test02();
             break;
         case 3:
-            test_result = test_p0003();
+            test_result = test03();
             break;
         case 4:
-            test_result = test_p0004();
+            test_result = test04();
             break;
         case 5:
-            test_result = test_p0005();
+            test_result = test05();
             break;
         case 6:
-            test_result = test_p0006();
+            test_result = test06();
             break;
         case 7:
-            test_result = test_p0007();
+            test_result = test07();
             break;
         case 8:
-            test_result = test_p0008();
+            test_result = test08();
             break;
         case 9:
-            test_result = test_p0009();
+            test_result = test09();
             break;
         case 10:
-            test_result = test_p0010();
+            test_result = test10();
             break;
         default:
             return -5;
@@ -74,7 +74,7 @@ int main(const int argc, char *argv[]) {
     return test_result ? 0 : -1;
 }
 
-bool test_p0001() {
+bool test01() {
     const int arr[] = {1, 2, 3, 4, 5};
     constexpr int size = 5;
     constexpr int target = 3;
@@ -83,7 +83,7 @@ bool test_p0001() {
     return expected == jumpSearch(arr, size, target);
 }
 
-bool test_p0002() {
+bool test02() {
     const int arr[] = {1, 2, 3, 4, 5};
     constexpr int size = 5;
     constexpr int target = 1;
@@ -92,7 +92,7 @@ bool test_p0002() {
     return expected == jumpSearch(arr, size, target);
 }
 
-bool test_p0003() {
+bool test03() {
     const int arr[] = {1, 2, 3, 4, 5};
     constexpr int size = 5;
     constexpr int target = 5;
@@ -101,7 +101,7 @@ bool test_p0003() {
     return expected == jumpSearch(arr, size, target);
 }
 
-bool test_p0004() {
+bool test04() {
     const int arr[] = {1, 2, 3, 4, 5};
     constexpr int size = 5;
     constexpr int target = 6;
@@ -110,7 +110,7 @@ bool test_p0004() {
     return expected == jumpSearch(arr, size, target);
 }
 
-bool test_p0005() {
+bool test05() {
     constexpr int arr[] = {1};
     constexpr int size = 0;  // simulate an empty array
     constexpr int target = 1;
@@ -119,7 +119,7 @@ bool test_p0005() {
     return expected == jumpSearch(arr, size, target);
 }
 
-bool test_p0006() {
+bool test06() {
     constexpr int arr[] = {1};
     constexpr int size = 1;
     constexpr int target = 1;
@@ -128,7 +128,7 @@ bool test_p0006() {
     return expected == jumpSearch(arr, size, target);
 }
 
-bool test_p0007() {
+bool test07() {
     constexpr int arr[] = {1};
     constexpr int size = 1;
     constexpr int target = 2;
@@ -137,7 +137,7 @@ bool test_p0007() {
     return expected == jumpSearch(arr, size, target);
 }
 
-bool test_p0008() {
+bool test08() {
     constexpr int arr[] = {1, 2};
     constexpr int size = 2;
     constexpr int target = 2;
@@ -146,7 +146,7 @@ bool test_p0008() {
     return expected == jumpSearch(arr, size, target);
 }
 
-bool test_p0009() {
+bool test09() {
     constexpr int size = 100;
     int arr[size];
     for (int i = 0; i < size; i++) {
@@ -162,7 +162,7 @@ bool test_p0009() {
     return true;
 }
 
-bool test_p0010() {
+bool test10() {
     constexpr int size = 1000;
     int arr[size];
     for (int i = 0; i < size; i++) {

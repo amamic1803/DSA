@@ -38,25 +38,25 @@ int main(const int argc, char *argv[]) {
     bool test_result;
     switch (problem_number) {
         case 1:
-            test_result = test_p0001();
+            test_result = test1();
             break;
         case 2:
-            test_result = test_p0002();
+            test_result = test2();
             break;
         case 3:
-            test_result = test_p0003();
+            test_result = test3();
             break;
         case 4:
-            test_result = test_p0004();
+            test_result = test4();
             break;
         case 5:
-            test_result = test_p0005();
+            test_result = test5();
             break;
         case 6:
-            test_result = test_p0006();
+            test_result = test6();
             break;
         case 7:
-            test_result = test_p0007();
+            test_result = test7();
             break;
         default:
             return -5;
@@ -65,7 +65,7 @@ int main(const int argc, char *argv[]) {
     return test_result ? 0 : -1;
 }
 
-bool test_p0001() {
+bool test1() {
     const int arr[] = {1, 2, 3, 4, 5};
     constexpr int size = 5;
     constexpr int target = 3;
@@ -74,7 +74,7 @@ bool test_p0001() {
     return expected == binarySearch(arr, size, target);
 }
 
-bool test_p0002() {
+bool test2() {
     const int arr[] = {1, 2, 3, 4, 5};
     constexpr int size = 5;
     constexpr int target = 1;
@@ -83,7 +83,7 @@ bool test_p0002() {
     return expected == binarySearch(arr, size, target);
 }
 
-bool test_p0003() {
+bool test3() {
     const int arr[] = {1, 2, 3, 4, 5};
     constexpr int size = 5;
     constexpr int target = 5;
@@ -92,7 +92,7 @@ bool test_p0003() {
     return expected == binarySearch(arr, size, target);
 }
 
-bool test_p0004() {
+bool test4() {
     const int arr[] = {1, 2, 3, 4, 5};
     constexpr int size = 5;
     constexpr int target = 6;
@@ -101,7 +101,7 @@ bool test_p0004() {
     return expected == binarySearch(arr, size, target);
 }
 
-bool test_p0005() {
+bool test5() {
     constexpr int arr[] = {1};
     constexpr int size = 0;  // simulate an empty array
     constexpr int target = 1;
@@ -110,7 +110,7 @@ bool test_p0005() {
     return expected == binarySearch(arr, size, target);
 }
 
-bool test_p0006() {
+bool test6() {
     constexpr int arr[] = {1};
     constexpr int size = 1;
     constexpr int target = 1;
@@ -119,7 +119,7 @@ bool test_p0006() {
     return expected == binarySearch(arr, size, target);
 }
 
-bool test_p0007() {
+bool test7() {
     constexpr int arr[] = {1};
     constexpr int size = 1;
     constexpr int target = 2;

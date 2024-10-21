@@ -27,10 +27,10 @@ set_target_properties(binary_search_tests PROPERTIES
         OUTPUT_NAME binary_search_tests
         RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests
 )
-add_test(NAME test_p0001 COMMAND binary_search_tests 1)
-add_test(NAME test_p0002 COMMAND binary_search_tests 2)
-add_test(NAME test_p0003 COMMAND binary_search_tests 3)
-add_test(NAME test_p0004 COMMAND binary_search_tests 4)
-add_test(NAME test_p0005 COMMAND binary_search_tests 5)
-add_test(NAME test_p0006 COMMAND binary_search_tests 6)
-add_test(NAME test_p0007 COMMAND binary_search_tests 7)
+add_test(NAME test1 COMMAND binary_search_tests 1)
+add_test(NAME test2 COMMAND binary_search_tests 2)
+add_test(NAME test3 COMMAND binary_search_tests 3)
+add_test(NAME test4 COMMAND binary_search_tests 4)
+add_test(NAME test5 COMMAND binary_search_tests 5)
+add_test(NAME test6 COMMAND binary_search_tests 6)
+add_test(NAME test7 COMMAND binary_search_tests 7)
