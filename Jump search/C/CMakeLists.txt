@@ -6,6 +6,7 @@ set(CMAKE_C_STANDARD 23)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 
 set(CMAKE_C_CLANG_TIDY clang-tidy -warnings-as-errors=*)
+set(CMAKE_CXX_CLANG_TIDY clang-tidy -warnings-as-errors=*)
 include(CTest)
 
 # Add the library

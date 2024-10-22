@@ -26,7 +26,7 @@ std::vector<unsigned long long> fibonacciSequence(const unsigned int n) {
 }
 
 unsigned long long fibonacciNumber(const unsigned int n) {
-    constexpr double sqrt5 = sqrt(5);
+    const double sqrt5 = sqrt(5);
     return static_cast<unsigned long long>(round((pow(1 + sqrt5, n) - pow(1 - sqrt5, n)) / (sqrt5 * pow(2, n))));
 }
 
