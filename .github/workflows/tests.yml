@@ -24,7 +24,9 @@ jobs:
         uses: egor-tensin/setup-gcc@v1
 
       - name: Get GCC version
-        run: gcc --version
+        run: |
+          gcc --version
+          clang-tidy --version
 
       - name: Set up Ninja
         run: |
