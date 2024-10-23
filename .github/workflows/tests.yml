@@ -24,7 +24,10 @@ jobs:
         run: |
           sudo apt update
           sudo apt install ninja-build -y
-          sudo apt install llvm -y
+          wget https://apt.llvm.org/llvm.sh
+          chmod +x llvm.sh
+          sudo ./llvm.sh 19
+          llvm-config --version
           clang-tidy --version
 
       - name: Set up Rust
