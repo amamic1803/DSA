@@ -29,7 +29,6 @@ jobs:
           sudo ./llvm.sh 19 all
           export PATH="/usr/lib/llvm-19/bin:$PATH"
           echo $PATH
-          where clang-tidy
           clang-tidy --version
 
       - name: Set up Rust
