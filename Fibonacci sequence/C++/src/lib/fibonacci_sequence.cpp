@@ -17,7 +17,7 @@ std::vector<unsigned long long> fibonacciSequence(const unsigned int n) {
         default:
             fibonacci_sequence.push_back(0);
             fibonacci_sequence.push_back(1);
-            for (int i = 2; i <= n; i++)
+            for (unsigned int i = 2; i <= n; i++)
                 fibonacci_sequence.push_back(fibonacci_sequence[i - 1] + fibonacci_sequence[i - 2]);
             break;
     }
@@ -41,7 +41,7 @@ unsigned long long fibonacciNumberRecursive(const unsigned int n) {
             unsigned long long Fn_1 = 1;
             unsigned long long Fn = Fn_1 + Fn_2;
 
-            for (int i = 2; i < n; i++) {
+            for (unsigned int i = 2; i < n; i++) {
                 Fn_2 = Fn_1;
                 Fn_1 = Fn;
                 Fn = Fn_1 + Fn_2;

@@ -5,6 +5,7 @@ import subprocess
 
 def main():
     ignored_dirs = get_ignored_dirs()
+    verbose = len(sys.argv) > 1 and (sys.argv[1] == "-v" or sys.argv[1] == "--verbose")
 
     print("Running tests...\n")
 
@@ -29,37 +30,37 @@ def main():
                         "-G", "Ninja",
                         "-S", ".",
                         "-B", "build"
-                    ]):
+                    ], verbose):
                         failed += 1
                         continue
-                    if not run_test(algorithm, language, path, ["cmake", "--build", "build"]):
+                    if not run_test(algorithm, language, path, ["cmake", "--build", "build"], verbose):
                         failed += 1
                         continue
-                    if not run_test(algorithm, language, os.path.join(path, "build"), ["ctest"]):
+                    if not run_test(algorithm, language, os.path.join(path, "build"), ["ctest"], verbose):
                         failed += 1
                         continue
                     print("OK")
                     succeeded += 1
                 case "Python":
-                    if not run_test(algorithm, language, path, ["ruff", "check", "."]):
+                    if not run_test(algorithm, language, path, ["ruff", "check", "."], verbose):
                         failed += 1
                         continue
-                    if not run_test(algorithm, language, path, ["python", "-m", "unittest"]):
+                    if not run_test(algorithm, language, path, ["python", "-m", "unittest"], verbose):
                         failed += 1
                         continue
                     print("OK")
                     succeeded += 1
                 case "Rust":
-                    if not run_test(algorithm, language, path, ["cargo", "clippy", "--", "-D", "warnings"]):
+                    if not run_test(algorithm, language, path, ["cargo", "clippy", "--", "-D", "warnings"], verbose):
                         failed += 1
                         continue
-                    if not run_test(algorithm, language, path, ["cargo", "fmt", "--all", "--", "--check"]):
+                    if not run_test(algorithm, language, path, ["cargo", "fmt", "--all", "--", "--check"], verbose):
                         failed += 1
                         continue
-                    if not run_test(algorithm, language, path, ["cargo", "build"]):
+                    if not run_test(algorithm, language, path, ["cargo", "build"], verbose):
                         failed += 1
                         continue
-                    if not run_test(algorithm, language, path, ["cargo", "test"]):
+                    if not run_test(algorithm, language, path, ["cargo", "test"], verbose):
                         failed += 1
                         continue
                     print("OK")
@@ -75,7 +76,7 @@ def main():
     if failed > 0:
         sys.exit(1)
 
-def run_test(algorithm, language, path, args) -> bool:
+def run_test(algorithm, language, path, args, verbose) -> bool:
     ret = subprocess.run(
         args,
         cwd=path,
@@ -83,6 +84,7 @@ def run_test(algorithm, language, path, args) -> bool:
     )
     if ret.returncode != 0:
         print("FAIL")
+    if verbose or ret.returncode != 0:
         print(f"### {algorithm}/{language}", file=sys.stderr)
         print(f"COMMAND: {" ".join(ret.args)}", file=sys.stderr)
         print("STDOUT:", file=sys.stderr)
