@@ -1,7 +1,7 @@
 #include "fibonacci_sequence.hpp"
 #include "tests.hpp"
-#include <vector>
 #include <string>
+#include <vector>
 
 int main(const int argc, char *argv[]) {
     if (argc != 2) {

@@ -33,7 +33,7 @@ int main(const int argc, char *argv[]) {
         return -5; // Out of int range
     }
 
-    const int problem_number = val;
+    const int problem_number = (int) val;
 
     bool test_result;
     switch (problem_number) {
