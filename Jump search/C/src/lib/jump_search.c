@@ -1,5 +1,5 @@
-#include <math.h>
 #include "jump_search.h"
+#include <math.h>
 
 int jumpSearch(const int arr[], const int size, const int target) {
     // Explicitly handle the case where the array is empty, suppressing a compiler warning

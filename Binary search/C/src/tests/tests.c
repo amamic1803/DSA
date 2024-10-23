@@ -1,8 +1,8 @@
-#include <stdlib.h>
-#include <errno.h>
-#include <limits.h>
 #include "binary_search.h"
 #include "tests.h"
+#include <errno.h>
+#include <limits.h>
+#include <stdlib.h>
 
 
 int main(const int argc, char *argv[]) {
@@ -67,63 +67,63 @@ int main(const int argc, char *argv[]) {
 
 bool test1() {
     const int arr[] = {1, 2, 3, 4, 5};
-    constexpr int size = 5;
-    constexpr int target = 3;
-    constexpr int expected = 2;
+    const int size = 5;
+    const int target = 3;
+    const int expected = 2;
 
     return expected == binarySearch(arr, size, target);
 }
 
 bool test2() {
     const int arr[] = {1, 2, 3, 4, 5};
-    constexpr int size = 5;
-    constexpr int target = 1;
-    constexpr int expected = 0;
+    const int size = 5;
+    const int target = 1;
+    const int expected = 0;
 
     return expected == binarySearch(arr, size, target);
 }
 
 bool test3() {
     const int arr[] = {1, 2, 3, 4, 5};
-    constexpr int size = 5;
-    constexpr int target = 5;
-    constexpr int expected = 4;
+    const int size = 5;
+    const int target = 5;
+    const int expected = 4;
 
     return expected == binarySearch(arr, size, target);
 }
 
 bool test4() {
     const int arr[] = {1, 2, 3, 4, 5};
-    constexpr int size = 5;
-    constexpr int target = 6;
-    constexpr int expected = -1;
+    const int size = 5;
+    const int target = 6;
+    const int expected = -1;
 
     return expected == binarySearch(arr, size, target);
 }
 
 bool test5() {
-    constexpr int arr[] = {1};
-    constexpr int size = 0;  // simulate an empty array
-    constexpr int target = 1;
-    constexpr int expected = -1;
+    const int arr[] = {1};
+    const int size = 0;  // simulate an empty array
+    const int target = 1;
+    const int expected = -1;
 
     return expected == binarySearch(arr, size, target);
 }
 
 bool test6() {
-    constexpr int arr[] = {1};
-    constexpr int size = 1;
-    constexpr int target = 1;
-    constexpr int expected = 0;
+    const int arr[] = {1};
+    const int size = 1;
+    const int target = 1;
+    const int expected = 0;
 
     return expected == binarySearch(arr, size, target);
 }
 
 bool test7() {
-    constexpr int arr[] = {1};
-    constexpr int size = 1;
-    constexpr int target = 2;
-    constexpr int expected = -1;
+    const int arr[] = {1};
+    const int size = 1;
+    const int target = 2;
+    const int expected = -1;
 
     return expected == binarySearch(arr, size, target);
 }

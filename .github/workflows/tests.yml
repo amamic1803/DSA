@@ -24,12 +24,6 @@ jobs:
         run: |
           sudo apt update
           sudo apt install ninja-build -y
-          wget https://apt.llvm.org/llvm.sh
-          chmod +x llvm.sh
-          sudo ./llvm.sh 19 all
-          export PATH="/usr/lib/llvm-19/bin:$PATH"
-          echo $PATH
-          clang-tidy --version
 
       - name: Set up Rust
         uses: dtolnay/rust-toolchain@master
@@ -46,4 +40,4 @@ jobs:
         run: pip install ruff
 
       - name: Run tests
-        run: python ./test.py --verbose
+        run: python ./test.py

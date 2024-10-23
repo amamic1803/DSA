@@ -1,8 +1,8 @@
-#include <stdlib.h>
-#include <errno.h>
-#include <limits.h>
 #include "jump_search.h"
 #include "tests.h"
+#include <errno.h>
+#include <limits.h>
+#include <stdlib.h>
 
 
 int main(const int argc, char *argv[]) {
@@ -76,78 +76,78 @@ int main(const int argc, char *argv[]) {
 
 bool test01() {
     const int arr[] = {1, 2, 3, 4, 5};
-    constexpr int size = 5;
-    constexpr int target = 3;
-    constexpr int expected = 2;
+    const int size = 5;
+    const int target = 3;
+    const int expected = 2;
 
     return expected == jumpSearch(arr, size, target);
 }
 
 bool test02() {
     const int arr[] = {1, 2, 3, 4, 5};
-    constexpr int size = 5;
-    constexpr int target = 1;
-    constexpr int expected = 0;
+    const int size = 5;
+    const int target = 1;
+    const int expected = 0;
 
     return expected == jumpSearch(arr, size, target);
 }
 
 bool test03() {
     const int arr[] = {1, 2, 3, 4, 5};
-    constexpr int size = 5;
-    constexpr int target = 5;
-    constexpr int expected = 4;
+    const int size = 5;
+    const int target = 5;
+    const int expected = 4;
 
     return expected == jumpSearch(arr, size, target);
 }
 
 bool test04() {
     const int arr[] = {1, 2, 3, 4, 5};
-    constexpr int size = 5;
-    constexpr int target = 6;
-    constexpr int expected = -1;
+    const int size = 5;
+    const int target = 6;
+    const int expected = -1;
 
     return expected == jumpSearch(arr, size, target);
 }
 
 bool test05() {
-    constexpr int arr[] = {1};
-    constexpr int size = 0;  // simulate an empty array
-    constexpr int target = 1;
-    constexpr int expected = -1;
+    const int arr[] = {1};
+    const int size = 0;  // simulate an empty array
+    const int target = 1;
+    const int expected = -1;
 
     return expected == jumpSearch(arr, size, target);
 }
 
 bool test06() {
-    constexpr int arr[] = {1};
-    constexpr int size = 1;
-    constexpr int target = 1;
-    constexpr int expected = 0;
+    const int arr[] = {1};
+    const int size = 1;
+    const int target = 1;
+    const int expected = 0;
 
     return expected == jumpSearch(arr, size, target);
 }
 
 bool test07() {
-    constexpr int arr[] = {1};
-    constexpr int size = 1;
-    constexpr int target = 2;
-    constexpr int expected = -1;
+    const int arr[] = {1};
+    const int size = 1;
+    const int target = 2;
+    const int expected = -1;
 
     return expected == jumpSearch(arr, size, target);
 }
 
 bool test08() {
-    constexpr int arr[] = {1, 2};
-    constexpr int size = 2;
-    constexpr int target = 2;
-    constexpr int expected = 1;
+    const int arr[] = {1, 2};
+    const int size = 2;
+    const int target = 2;
+    const int expected = 1;
 
     return expected == jumpSearch(arr, size, target);
 }
 
 bool test09() {
-    constexpr int size = 100;
+    const int size = 100;
     int arr[size];
     for (int i = 0; i < size; i++) {
         arr[i] = i;
@@ -163,7 +163,7 @@ bool test09() {
 }
 
 bool test10() {
-    constexpr int size = 1000;
+    const int size = 1000;
     int arr[size];
     for (int i = 0; i < size; i++) {
         arr[i] = i * 2;
