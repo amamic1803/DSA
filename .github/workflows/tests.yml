@@ -20,23 +20,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up GCC
-        uses: egor-tensin/setup-gcc@v1
-
-      - name: Set up Clang
-        uses: egor-tensin/setup-clang@v1
-        with:
-          version: 19
-
-      - name: Get GCC version
-        run: |
-          gcc --version
-          clang-tidy --version
-
-      - name: Set up Ninja
+      - name: Install C/C++ tools
         run: |
           sudo apt update
-          sudo apt install -y ninja-build
+          sudo apt install ninja-build -y
 
       - name: Set up Rust
         uses: dtolnay/rust-toolchain@master

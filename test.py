@@ -24,8 +24,8 @@ def main():
                         "-DCMAKE_C_COMPILER=gcc",
                         "-DCMAKE_CXX_COMPILER=g++",
                         "-DCMAKE_BUILD_TYPE=Release",
-                        "-DCMAKE_C_FLAGS='-Wall -Wextra -Wpedantic'",
-                        "-DCMAKE_CXX_FLAGS='-Wall -Wextra -Wpedantic'",
+                        "-DCMAKE_C_FLAGS='-Wall -Wextra -Wpedantic -Werror'",
+                        "-DCMAKE_CXX_FLAGS='-Wall -Wextra -Wpedantic -Werror'",
                         "-G", "Ninja",
                         "-S", ".",
                         "-B", "build"
