@@ -24,6 +24,8 @@ jobs:
         run: |
           sudo apt update
           sudo apt install ninja-build -y
+          sudo apt install llvm -y
+          echo clang-tidy --version
 
       - name: Set up Rust
         uses: dtolnay/rust-toolchain@master
