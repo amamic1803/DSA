@@ -14,11 +14,11 @@ include(CTest)
 # Add the library
 add_library(linked_list_lib STATIC
         src/lib/include/linked_list.hpp
-        src/lib/singly_linked.cpp
-        src/lib/doubly_linked.cpp
 )
 target_include_directories(linked_list_lib PRIVATE src/lib/include)
 set_target_properties(linked_list_lib PROPERTIES
+        LANGUAGE CXX
+        LINKER_LANGUAGE CXX
         OUTPUT_NAME linked_list
         PUBLIC_HEADER src/lib/include/linked_list.hpp
 )
@@ -28,7 +28,13 @@ add_executable(linked_list_tests src/tests/tests.hpp src/tests/tests.cpp)
 target_include_directories(linked_list_tests PRIVATE src/lib/include)
 target_link_libraries(linked_list_tests linked_list_lib)
 set_target_properties(linked_list_tests PROPERTIES
+        LANGUAGE CXX
+        LINKER_LANGUAGE CXX
         OUTPUT_NAME linked_list_tests
         RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests
 )
 add_test(NAME test_p0001 COMMAND linked_list_tests 1)
+
+add_executable(linked_list_main src/main.cpp)
+target_include_directories(linked_list_main PRIVATE src/lib/include)
+target_link_libraries(linked_list_main linked_list_lib)
