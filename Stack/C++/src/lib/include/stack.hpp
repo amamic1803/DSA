@@ -1,8 +1,10 @@
 #ifndef STACK_LIB_HPP
 #define STACK_LIB_HPP
 
+#include <algorithm>
 #include <cstdlib>
 #include <new>
+#include <utility>
 
 template <typename T>
 class Stack {
@@ -10,6 +12,28 @@ protected:
     int _size = 0;
 public:
     Stack() = default;
+
+    Stack(const Stack& other) = default;
+
+    Stack(Stack&& other) noexcept : _size(other._size) {
+        other._size = 0;
+    }
+
+    Stack& operator=(const Stack& other) {
+        if (this == &other)
+            return *this;
+        _size = other._size;
+        return *this;
+    }
+
+    Stack& operator=(Stack&& other) noexcept {
+        if (this == &other)
+            return *this;
+        _size = other._size;
+        other._size = 0;
+        return *this;
+    }
+
     virtual ~Stack() = default;
 
     /**
@@ -66,9 +90,45 @@ private:
     Node* top = nullptr;
 public:
     ListStack() = default;
-    ~ListStack() override {
-        this->clear();
+
+    ListStack(const ListStack& other) : Stack<T>(other), top(other.top) {
+        Node** current = &(top);
+        while (*current != nullptr) {
+            Node* new_node = new Node((*current)->data, (*current)->next);
+            *current = new_node;
+            current = &((*current)->next);
+        }
     }
+
+    ListStack(ListStack&& other) noexcept : Stack<T>(std::move(other)), top(other.top) {
+        other.top = nullptr;
+    }
+
+    ListStack& operator=(const ListStack& other) {
+        if (this == &other)
+            return *this;
+        Stack<T>::operator=(other);
+        top = other.top;
+        Node** current = &(top);
+        while (*current != nullptr) {
+            Node* new_node = new Node((*current)->data, (*current)->next);
+            *current = new_node;
+            current = &((*current)->next);
+        }
+        return *this;
+    }
+
+    ListStack& operator=(ListStack&& other) noexcept {
+        if (this == &other)
+            return *this;
+        Stack<T>::operator=(std::move(other));
+        top = other.top;
+        other.top = nullptr;
+        return *this;
+    }
+
+    ~ListStack() override { this->clear(); }
+
     bool push(T value) override {
         Node* new_node = new (std::nothrow) Node(value, top);
         if (new_node == nullptr)
@@ -77,6 +137,7 @@ public:
         this->_size++;
         return true;
     }
+
     bool pop(T& value) override {
         Node* top_node = top;
         if (top_node == nullptr)
@@ -87,6 +148,7 @@ public:
         this->_size--;
         return true;
     }
+
     bool peek(T& value) override {
         Node* top_node = top;
         if (top_node == nullptr)
@@ -99,18 +161,50 @@ public:
 template <typename T>
 class StaticStack : public Stack<T> {
 private:
-    int capacity;
-    T data[] = new T[capacity];
+    int _capacity;
+    T data[] = new T[_capacity];
     int top = -1;
 public:
-    explicit StaticStack(const int capacity) : capacity(capacity) {}
+    explicit StaticStack(const int capacity) : _capacity(capacity) {}
 
-    ~StaticStack() override {
-        delete[] data;
+    StaticStack(const StaticStack& other) : Stack<T>(other), _capacity(other._capacity), top(other.top) {
+        data = new T[_capacity];
+        std::copy(other.data, other.data + _capacity, data);
     }
 
+    StaticStack(StaticStack&& other) noexcept : Stack<T>(std::move(other)), _capacity(other._capacity), top(other.top) {
+        data = new T[_capacity];
+        std::copy(other.data, other.data + _capacity, data);
+    }
+
+    StaticStack& operator=(const StaticStack& other) {
+        if (this == &other)
+            return *this;
+        Stack<T>::operator =(other);
+        _capacity = other._capacity;
+        top = other.top;
+        data = new T[_capacity];
+        std::copy(other.data, other.data + _capacity, data);
+        return *this;
+    }
+
+    StaticStack& operator=(StaticStack&& other) noexcept {
+        if (this == &other)
+            return *this;
+        Stack<T>::operator =(std::move(other));
+        _capacity = other._capacity;
+        top = other.top;
+        data = new T[_capacity];
+        std::copy(other.data, other.data + _capacity, data);
+        return *this;
+    }
+
+    ~StaticStack() override = default;
+
+    [[nodiscard]] int capacity() const { return _capacity; }
+
     bool push(T value) override {
-        if (top + 1 < capacity) {
+        if (top + 1 < _capacity) {
             data[top] = value;
             top++;
             this->_size++;
@@ -142,20 +236,49 @@ private:
     T* data;
     int top;
 public:
-    DynamicStack() : _capacity(4), data(new T[_capacity]), top(-1) {
-        if (this->data == nullptr)
-            throw std::bad_alloc();
-    }
+    DynamicStack() : _capacity(4), data(new T[_capacity]), top(-1) {}
+
     explicit DynamicStack(const int capacity) : _capacity(capacity), top(-1) {
         if (_capacity < 4)
             this->_capacity = 4;
         this->data = new T[_capacity];
-        if (this->data == nullptr)
-            throw std::bad_alloc();
     }
-    ~DynamicStack() override {
-        free(data);
+
+    DynamicStack(const DynamicStack& other) : Stack<T>(other), _capacity(other._capacity), data(new T[_capacity]), top(other.top) {
+        std::copy(other.data, other.data + _capacity, data);
     }
+
+    DynamicStack(DynamicStack&& other) noexcept : Stack<T>(std::move(other)), _capacity(other._capacity), data(other.data), top(other.top) {
+        other._capacity = 4;
+        other.data = new T[other._capacity];
+        other.top = -1;
+    }
+
+    DynamicStack& operator=(const DynamicStack& other) {
+        if (this == &other)
+            return *this;
+        Stack<T>::operator =(other);
+        _capacity = other._capacity;
+        data = new T[_capacity];
+        std::copy(other.data, other.data + _capacity, data);
+        top = other.top;
+        return *this;
+    }
+
+    DynamicStack& operator=(DynamicStack&& other) noexcept {
+        if (this == &other)
+            return *this;
+        Stack<T>::operator =(std::move(other));
+        _capacity = other._capacity;
+        other._capacity = 4;
+        data = other.data;
+        other.data = new T[other._capacity];
+        top = other.top;
+        other.top = -1;
+        return *this;
+    }
+
+    ~DynamicStack() override { free(data); }
 
     [[nodiscard]] int capacity() const { return _capacity; }
 
