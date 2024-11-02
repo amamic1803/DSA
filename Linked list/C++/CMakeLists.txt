@@ -33,8 +33,15 @@ set_target_properties(linked_list_tests PROPERTIES
         OUTPUT_NAME linked_list_tests
         RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests
 )
-add_test(NAME test_p0001 COMMAND linked_list_tests 1)
-
-add_executable(linked_list_main src/main.cpp)
-target_include_directories(linked_list_main PRIVATE src/lib/include)
-target_link_libraries(linked_list_main linked_list_lib)
+add_test(NAME test_SinglyLinkedList1 COMMAND linked_list_tests SinglyLinkedList1)
+add_test(NAME test_SinglyLinkedList2 COMMAND linked_list_tests SinglyLinkedList2)
+add_test(NAME test_SinglyLinkedList3 COMMAND linked_list_tests SinglyLinkedList3)
+add_test(NAME test_SinglyLinkedList4 COMMAND linked_list_tests SinglyLinkedList4)
+add_test(NAME test_SinglyLinkedList5 COMMAND linked_list_tests SinglyLinkedList5)
+add_test(NAME test_SinglyLinkedList6 COMMAND linked_list_tests SinglyLinkedList6)
+add_test(NAME test_DoublyLinkedList1 COMMAND linked_list_tests DoublyLinkedList1)
+add_test(NAME test_DoublyLinkedList2 COMMAND linked_list_tests DoublyLinkedList2)
+add_test(NAME test_DoublyLinkedList3 COMMAND linked_list_tests DoublyLinkedList3)
+add_test(NAME test_DoublyLinkedList4 COMMAND linked_list_tests DoublyLinkedList4)
+add_test(NAME test_DoublyLinkedList5 COMMAND linked_list_tests DoublyLinkedList5)
+add_test(NAME test_DoublyLinkedList6 COMMAND linked_list_tests DoublyLinkedList6)

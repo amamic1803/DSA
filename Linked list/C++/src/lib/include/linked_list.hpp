@@ -10,11 +10,16 @@ protected:
     int _size = 0;
 public:
     // constructors
-    LinkedList() noexcept = default ;
-    explicit LinkedList(int size) noexcept : _size(size) {}
+    LinkedList() = default;
 
     // destructor
-    virtual ~LinkedList() { clear(); }
+    virtual ~LinkedList() = default;
+
+    /**
+     * @brief Returns a copy of this LinkedList instance.
+     * @return a copy of this LinkedList instance
+     */
+    [[nodiscard]] virtual LinkedList* clone() const = 0;
 
     // copy constructor
     LinkedList(const LinkedList& other) = default;
@@ -169,7 +174,8 @@ public:
     SinglyLinkedList() = default;
 
     // copy constructor
-    SinglyLinkedList(const SinglyLinkedList& other) : LinkedList<T>(other._size) {
+    SinglyLinkedList(const SinglyLinkedList& other) : LinkedList<T>() {
+        this->_size = other._size;
         Node** p = &head;
         for (T value : other) {
             *p = new Node(value);
@@ -192,7 +198,8 @@ public:
     }
 
     // move constructor
-    SinglyLinkedList(SinglyLinkedList&& other) noexcept : head(other.head), LinkedList<T>(other._size) {
+    SinglyLinkedList(SinglyLinkedList&& other) noexcept : LinkedList<T>(), head(other.head) {
+        this->_size = other._size;
         other.head = nullptr;
         other._size = 0;
     }
@@ -210,7 +217,11 @@ public:
     }
 
     // destructor
-    ~SinglyLinkedList() override = default;
+    ~SinglyLinkedList() override { this->clear(); }
+
+    [[nodiscard]] SinglyLinkedList* clone() const override {
+        return new SinglyLinkedList(*this);
+    }
 
     [[nodiscard]] T& get(int index) const override {
         if (index < 0 || index >= this->_size)
@@ -294,8 +305,8 @@ public:
             return current != other.current;
         }
     };
-    Iterator begin() { return Iterator(head); }
-    Iterator end() { return Iterator(nullptr); }
+    [[nodiscard]] Iterator begin() const { return Iterator(head); }
+    [[nodiscard]] Iterator end() const { return Iterator(nullptr); }
 };
 
 template <typename T> class DoublyLinkedList : public LinkedList<T> {
@@ -315,19 +326,55 @@ public:
     DoublyLinkedList() = default;
 
     // copy constructor
-    DoublyLinkedList(const DoublyLinkedList& other) : LinkedList<T>(other._size) {}
+    DoublyLinkedList(const DoublyLinkedList& other) : LinkedList<T>() {
+        this->_size = other._size;
+        Node** p = &head;
+        for (T value : other) {
+            *p = new Node(value);
+            p = &((*p)->next);
+        }
+    }
 
     // copy assignment
-    DoublyLinkedList& operator=(const DoublyLinkedList& other) {}
+    DoublyLinkedList& operator=(const DoublyLinkedList& other) {
+        if (this != &other) {
+            this->clear();
+            this->_size = other._size;
+            Node** p = &head;
+            for (T value : other) {
+                *p = new Node(value);
+                p = &((*p)->next);
+            }
+        }
+        return *this;
+    }
 
     // move constructor
-    DoublyLinkedList(DoublyLinkedList&& other) noexcept {}
+    DoublyLinkedList(DoublyLinkedList&& other) noexcept : LinkedList<T>(), head(other.head), tail(other.tail) {
+        this->_size = other._size;
+        other.head = other.tail = nullptr;
+        other._size = 0;
+    }
 
     // move assignment
-    DoublyLinkedList& operator=(DoublyLinkedList&& other) noexcept {}
+    DoublyLinkedList& operator=(DoublyLinkedList&& other) noexcept {
+        if (this != &other) {
+            this->clear();
+            head = other.head;
+            tail = other.tail;
+            this->_size = other._size;
+            other.head = other.tail = nullptr;
+            other._size = 0;
+        }
+        return *this;
+    }
 
     // destructor
-    ~DoublyLinkedList() override = default;
+    ~DoublyLinkedList() override { this->clear(); }
+
+    [[nodiscard]] DoublyLinkedList* clone() const override {
+        return new DoublyLinkedList(*this);
+    }
 
     [[nodiscard]] T& get(int index) const override {
         if (index < 0 || index >= this->_size)
@@ -353,34 +400,160 @@ public:
 
         if (this->_size == 0) {
             head = tail = new Node(value);
+        } else if (index == 0) {
+            // insert at the beginning
+            Node* new_node = new Node(value, nullptr, head);
+            head->prev = new_node;
+            head = new_node;
+        } else if (index == this->_size) {
+            // insert at the end
+            Node* new_node = new Node(value, tail, nullptr);
+            tail->next = new_node;
+            tail = new_node;
         } else if (index <= this->_size >> 1) {
             // insert from the head
             Node* current = head;
-            for (int i = 0; i < index; i++)
+            for (int i = 1; i < index; i++)
                 current = current->next;
-            Node* new_node = new Node(value, current->prev, current);
-            // popraviti ako je prev == nullptr
+            Node* new_node = new Node(value, current, current->next);
             new_node->prev->next = new_node;
-            new_node->next->prev = new_node;
+            if (new_node->next != nullptr)
+                new_node->next->prev = new_node;
         } else {
             // insert from the tail
-
+            Node* current = tail;
+            for (int i = this->_size - 1; i > index; i--)
+                current = current->prev;
+            Node* new_node = new Node(value, current->prev, current);
+            new_node->next->prev = new_node;
+            if (new_node->prev != nullptr)
+                new_node->prev->next = new_node;
         }
 
         this->_size++;
     }
 
     T erase(int index) override {
-        return true;
+        if (index < 0 || index >= this->_size)
+            throw std::out_of_range("Index out of bounds");
+
+        T value;
+        if (this->_size == 1) {
+            value = head->data;
+            delete head;
+            head = tail = nullptr;
+        } else if (index == 0) {
+            // remove from the beginning
+            Node* temp = head;
+            value = temp->data;
+            temp->next->prev = nullptr;
+            head = temp->next;
+            delete temp;
+        } else if (index == this->_size - 1) {
+            // remove from the end
+            Node* temp = tail;
+            value = temp->data;
+            temp->prev->next = nullptr;
+            tail = temp->prev;
+            delete temp;
+        } else if (index <= this->_size >> 1) {
+            // remove from the head
+            Node* current = head;
+            for (int i = 0; i < index; i++)
+                current = current->next;
+            Node* temp = current;
+            value = temp->data;
+            temp->prev->next = temp->next;
+            if (temp->next != nullptr)
+                temp->next->prev = temp->prev;
+            delete temp;
+        } else {
+            // remove from the tail
+            Node* current = tail;
+            for (int i = this->_size - 1; i > index; i--)
+                current = current->prev;
+            Node* temp = current;
+            value = temp->data;
+            temp->next->prev = temp->prev;
+            if (temp->prev != nullptr)
+                temp->prev->next = temp->next;
+            delete temp;
+        }
+
+        this->_size--;
+
+        return value;
     }
 
-    bool remove(T value) override {
-        return true;
+    bool remove(const T& value) override {
+        Node* current = head;
+
+        while (current != nullptr) {
+            if (current->data == value) {
+                if (current->prev != nullptr)
+                    current->prev->next = current->next;
+                if (current->next != nullptr)
+                    current->next->prev = current->prev;
+                if (current == head)
+                    head = current->next;
+                if (current == tail)
+                    tail = current->prev;
+                delete current;
+                this->_size--;
+                return true;
+            }
+            current = current->next;
+        }
+
+        return false;
     }
 
-    int remove_all(T value) override {
-        return 0;
+    int remove_all(const T& value) override {
+        int removed = 0;
+        Node* current = head;
+
+        while (current != nullptr) {
+            if (current->data == value) {
+                if (current->prev != nullptr)
+                    current->prev->next = current->next;
+                if (current->next != nullptr)
+                    current->next->prev = current->prev;
+                if (current == head)
+                    head = current->next;
+                if (current == tail)
+                    tail = current->prev;
+                Node* temp = current;
+                current = current->next;
+                delete temp;
+                this->_size--;
+                removed++;
+            } else {
+                current = current->next;
+            }
+        }
+
+        return removed;
     }
+
+    class Iterator {
+    private:
+        Node* current;
+    public:
+        explicit Iterator(Node* node) : current(node) {}
+
+        T& operator*() const { return current->data; }
+
+        Iterator& operator++() {
+            current = current->next;
+            return *this;
+        }
+
+        bool operator!=(const Iterator& other) const {
+            return current != other.current;
+        }
+    };
+    [[nodiscard]] Iterator begin() const { return Iterator(head); }
+    [[nodiscard]] Iterator end() const { return Iterator(nullptr); }
 };
 
 #endif // LINKED_LIST_HPP
