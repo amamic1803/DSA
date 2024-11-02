@@ -12,9 +12,9 @@ def main():
     succeeded = 0
     failed = 0
 
-    for (i, algorithm) in enumerate(filter(lambda x: os.path.isdir(x) and x not in ignored_dirs, os.listdir())):
+    for (i, algorithm) in enumerate(filter(lambda x: os.path.isdir(x) and x not in ignored_dirs, sorted(os.listdir()))):
         print(f"#{i + 1:02d} {algorithm}")
-        for (j, language) in enumerate(filter(lambda x: os.path.isdir(os.path.join(algorithm, x)) and x not in ignored_dirs, os.listdir(algorithm))):
+        for (j, language) in enumerate(filter(lambda x: os.path.isdir(os.path.join(algorithm, x)) and x not in ignored_dirs, sorted(os.listdir(algorithm)))):
             print(f"    {chr(ord('a') + j)}) {language.ljust(10)} ... ", end="")
             sys.stdout.flush()
             path = os.path.join(algorithm, language)
