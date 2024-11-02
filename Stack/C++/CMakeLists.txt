@@ -33,4 +33,23 @@ set_target_properties(stack_tests PROPERTIES
         OUTPUT_NAME stack_tests
         RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests
 )
-add_test(NAME test_p0001 COMMAND stack_tests 1)
+add_test(NAME test_ListStack1 COMMAND stack_tests ListStack1)
+add_test(NAME test_ListStack2 COMMAND stack_tests ListStack2)
+add_test(NAME test_ListStack3 COMMAND stack_tests ListStack3)
+add_test(NAME test_ListStack4 COMMAND stack_tests ListStack4)
+add_test(NAME test_ListStack5 COMMAND stack_tests ListStack5)
+add_test(NAME test_ListStack6 COMMAND stack_tests ListStack6)
+
+add_test(NAME test_StaticStack1 COMMAND stack_tests StaticStack1)
+add_test(NAME test_StaticStack2 COMMAND stack_tests StaticStack2)
+add_test(NAME test_StaticStack3 COMMAND stack_tests StaticStack3)
+add_test(NAME test_StaticStack4 COMMAND stack_tests StaticStack4)
+add_test(NAME test_StaticStack5 COMMAND stack_tests StaticStack5)
+add_test(NAME test_StaticStack6 COMMAND stack_tests StaticStack6)
+
+add_test(NAME test_DynamicStack1 COMMAND stack_tests DynamicStack1)
+add_test(NAME test_DynamicStack2 COMMAND stack_tests DynamicStack2)
+add_test(NAME test_DynamicStack3 COMMAND stack_tests DynamicStack3)
+add_test(NAME test_DynamicStack4 COMMAND stack_tests DynamicStack4)
+add_test(NAME test_DynamicStack5 COMMAND stack_tests DynamicStack5)
+add_test(NAME test_DynamicStack6 COMMAND stack_tests DynamicStack6)
