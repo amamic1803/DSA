@@ -164,10 +164,9 @@ public:
     }
 
     bool peek(T& value) override {
-        Node* top_node = top;
-        if (top_node == nullptr)
+        if (top == nullptr)
             return false;
-        value = top_node->data;
+        value = top->data;
         return true;
     }
 };
