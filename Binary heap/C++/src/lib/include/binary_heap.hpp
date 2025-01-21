@@ -38,7 +38,7 @@ private:
      *
      * @param capacity The new capacity.
      */
-    void reserve_capacity(int capacity) {
+    void reserve_capacity(const int capacity) {
         if (capacity <= _capacity) {
             return;
         }
@@ -67,7 +67,7 @@ private:
      * @brief Heapify the heap starting from the given index (node).
      * @param i The index (node) to start heapifying from.
      */
-    void heapify(int i) {
+    void heapify(const int i) {
         const int left = (i << 1) + 1;
         const int right = (i << 1) + 2;
 
@@ -83,6 +83,23 @@ private:
             swap(i, largest);
             heapify(largest);
         }
+    }
+
+    /**
+     * @brief Search for an element in the heap recursively.
+     * @param item The element to search for.
+     * @param i The index of the current node.
+     */
+    [[nodiscard]] bool search_rec(const T& item, const int i) const {
+        if (i >= _size || _heap[i] < item) {
+            return false;
+        }
+        if (item == _heap[i]) {
+            return true;
+        }
+        const int left = (i << 1) + 1;
+        const int right = (i << 1) + 2;
+        return search_rec(item, left) || search_rec(item, right);
     }
 public:
     // default constructor
@@ -197,12 +214,7 @@ public:
      * @return true if the item is in the heap, false otherwise.
      */
     [[nodiscard]] bool search(const T& item) const {
-        for (int i = 0; i < _size; i++) {
-            if (_heap[i] == item) {
-                return true;
-            }
-        }
-        return false;
+        return search_rec(item, 0);
     }
 
     /**
