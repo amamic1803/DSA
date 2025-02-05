@@ -120,17 +120,19 @@ public:
 
     // copy constructor
     BinaryHeap(const BinaryHeap &other) : _size(other._size), _capacity(other._capacity) {
-        _heap = static_cast<T*>(malloc(_capacity * sizeof(T)));
+        _heap = static_cast<T*>(realloc(_heap, _capacity * sizeof(T)));
         if (_heap == nullptr) {
             _capacity = 0;
             _size = 0;
             throw std::bad_alloc();
         }
-        std::copy(other._heap, other._heap + _size, _heap);
+        std::copy(other._heap, other._heap + other._size, _heap);
     }
 
     // move constructor
-    BinaryHeap(BinaryHeap &&other) noexcept : _heap(other._heap), _size(other._size), _capacity(other._capacity) {
+    BinaryHeap(BinaryHeap &&other) noexcept : _size(other._size), _capacity(other._capacity) {
+        free(_heap);
+        _heap = other._heap;
         other._heap = nullptr;
         other._size = 0;
         other._capacity = 0;
@@ -139,16 +141,15 @@ public:
     // copy assignment
     BinaryHeap &operator=(const BinaryHeap &other) {
         if (this != &other) {
-            free(_heap);
             _size = other._size;
             _capacity = other._capacity;
-            _heap = static_cast<T*>(malloc(_capacity * sizeof(T)));
+            _heap = static_cast<T*>(realloc(_heap, _capacity * sizeof(T)));
             if (_heap == nullptr) {
                 _capacity = 0;
                 _size = 0;
                 throw std::bad_alloc();
             }
-            std::copy(other._heap, other._heap + _size, _heap);
+            std::copy(other._heap, other._heap + other._size, _heap);
         }
         return *this;
     }
