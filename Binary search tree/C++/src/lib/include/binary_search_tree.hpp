@@ -157,7 +157,7 @@ private:
      * @param node The node to balance
      * @return
      */
-    void balance(std::vector<T> &elements, int start, int end, std::unique_ptr<Node> &node) {
+    void balance(std::vector<T> &elements, const int start, const int end, std::unique_ptr<Node> &node) {
         if (start < end) {
             const int mid = start + (end - start) / 2;
             node = std::make_unique<Node>(elements[mid]);
@@ -169,7 +169,7 @@ private:
     /**
      * @brief Recursive helper function to check if the tree is balanced
      * @param node The node to check
-     * @return The height of the tree (all bits but the least significant bit) and whether the tree is balanced (least significant bit)
+     * @return The height of the tree (all bits but the least significant bit) and whether the tree is balanced (the least significant bit)
      */
     int balanced_height(std::unique_ptr<Node> &node) {
         if (node) {
