@@ -11,7 +11,10 @@ env:
 jobs:
   test-and-lint:
     name: Test and Lint
-    runs-on: ubuntu-24.04
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
     defaults:
       run:
         shell: bash
@@ -22,8 +25,21 @@ jobs:
 
       - name: Install C/C++ tools
         run: |
-          sudo apt update
-          sudo apt install ninja-build -y
+          if [ "$RUNNER_OS" == "Linux" ]; then
+              sudo apt update
+              sudo apt install ninja-build -y
+          elif [ "$RUNNER_OS" == "Windows" ]; then
+              choco install ninja
+              choco install mingw
+          elif [ "$RUNNER_OS" == "macOS" ]; then
+              brew install ninja
+              brew install llvm
+              ln -s "$(brew --prefix llvm)/bin/clang-format" "/usr/local/bin/clang-format"
+              ln -s "$(brew --prefix llvm)/bin/clang-tidy" "/usr/local/bin/clang-tidy"
+          else
+              echo "$RUNNER_OS not supported"
+              exit 1
+          fi
 
       - name: Set up Rust
         uses: dtolnay/rust-toolchain@master
