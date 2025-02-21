@@ -1,18 +1,22 @@
 #ifndef GRAPH_TESTS_HPP
 #define GRAPH_TESTS_HPP
 
-bool test_SinglyLinkedList1();
-bool test_SinglyLinkedList2();
-bool test_SinglyLinkedList3();
-bool test_SinglyLinkedList4();
-bool test_SinglyLinkedList5();
-bool test_SinglyLinkedList6();
+bool test_GraphAdjacencyList1();
+bool test_GraphAdjacencyList2();
+bool test_GraphAdjacencyList3();
+bool test_GraphAdjacencyList4();
+bool test_GraphAdjacencyList5();
 
-bool test_DoublyLinkedList1();
-bool test_DoublyLinkedList2();
-bool test_DoublyLinkedList3();
-bool test_DoublyLinkedList4();
-bool test_DoublyLinkedList5();
-bool test_DoublyLinkedList6();
+bool test_GraphAdjacencyMatrix1();
+bool test_GraphAdjacencyMatrix2();
+bool test_GraphAdjacencyMatrix3();
+bool test_GraphAdjacencyMatrix4();
+bool test_GraphAdjacencyMatrix5();
+
+bool test_GraphIncidenceMatrix1();
+bool test_GraphIncidenceMatrix2();
+bool test_GraphIncidenceMatrix3();
+bool test_GraphIncidenceMatrix4();
+bool test_GraphIncidenceMatrix5();
 
 #endif // GRAPH_TESTS_HPP

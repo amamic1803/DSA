@@ -1,5 +1,6 @@
 #include "graph.hpp"
 #include "tests.hpp"
+#include <cassert>
 #include <string>
 #include <utility>
 
@@ -11,134 +12,212 @@ int main(const int argc, char *argv[]) {
     const std::string arg(argv[1]);
     bool test_result;
 
-    if (arg == "SinglyLinkedList1")
-        test_result = test_SinglyLinkedList1();
-    else if (arg == "SinglyLinkedList2")
-        test_result = test_SinglyLinkedList2();
-    else if (arg == "SinglyLinkedList3")
-        test_result = test_SinglyLinkedList3();
-    else if (arg == "SinglyLinkedList4")
-        test_result = test_SinglyLinkedList4();
-    else if (arg == "SinglyLinkedList5")
-        test_result = test_SinglyLinkedList5();
-    else if (arg == "SinglyLinkedList6")
-        test_result = test_SinglyLinkedList6();
-    else if (arg == "DoublyLinkedList1")
-        test_result = test_DoublyLinkedList1();
-    else if (arg == "DoublyLinkedList2")
-        test_result = test_DoublyLinkedList2();
-    else if (arg == "DoublyLinkedList3")
-        test_result = test_DoublyLinkedList3();
-    else if (arg == "DoublyLinkedList4")
-        test_result = test_DoublyLinkedList4();
-    else if (arg == "DoublyLinkedList5")
-        test_result = test_DoublyLinkedList5();
-    else if (arg == "DoublyLinkedList6")
-        test_result = test_DoublyLinkedList6();
+    if (arg == "GraphAdjacencyList1")
+        test_result = test_GraphAdjacencyList1();
+    else if (arg == "GraphAdjacencyList2")
+        test_result = test_GraphAdjacencyList2();
+    else if (arg == "GraphAdjacencyList3")
+        test_result = test_GraphAdjacencyList3();
+    else if (arg == "GraphAdjacencyList4")
+        test_result = test_GraphAdjacencyList4();
+    else if (arg == "GraphAdjacencyList5")
+        test_result = test_GraphAdjacencyList5();
+    else if (arg == "GraphAdjacencyMatrix1")
+        test_result = test_GraphAdjacencyMatrix1();
+    else if (arg == "GraphAdjacencyMatrix2")
+        test_result = test_GraphAdjacencyMatrix2();
+    else if (arg == "GraphAdjacencyMatrix3")
+        test_result = test_GraphAdjacencyMatrix3();
+    else if (arg == "GraphAdjacencyMatrix4")
+        test_result = test_GraphAdjacencyMatrix4();
+    else if (arg == "GraphAdjacencyMatrix5")
+        test_result = test_GraphAdjacencyMatrix5();
+    else if (arg == "GraphIncidenceMatrix1")
+        test_result = test_GraphIncidenceMatrix1();
+    else if (arg == "GraphIncidenceMatrix2")
+        test_result = test_GraphIncidenceMatrix2();
+    else if (arg == "GraphIncidenceMatrix3")
+        test_result = test_GraphIncidenceMatrix3();
+    else if (arg == "GraphIncidenceMatrix4")
+        test_result = test_GraphIncidenceMatrix4();
+    else if (arg == "GraphIncidenceMatrix5")
+        test_result = test_GraphIncidenceMatrix5();
     else
         return -3;
 
     return test_result ? 0 : -1;
 }
 
-bool test_SinglyLinkedList1() {
-    SinglyLinkedList<int> list;
-    list.insert(0, 1);
-    list.insert(1, 2);
-    list.insert(2, 3);
-    return list.get(0) == 1 && list.get(1) == 2 && list.get(2) == 3;
+bool test_GraphAdjacencyList1() {
+    // Test constructors, destructors, and assignment operators
+    GraphAdjacencyList<int> graph1;
+    GraphAdjacencyList<int> graph2(graph1);
+    const GraphAdjacencyList<int> graph3(std::move(graph1));
+    graph1 = graph2;
+    graph1 = std::move(graph2);
+    return true;
 }
 
-bool test_SinglyLinkedList2() {
-    SinglyLinkedList<int> list;
-    list.insert(0, 1);
-    list.insert(1, 2);
-    list.insert(2, 3);
-    list.erase(1);
-    return list.get(0) == 1 && list.get(1) == 3;
+bool test_GraphAdjacencyList2() {
+    // Test add_vertex, remove_vertex, size, and empty
+    GraphAdjacencyList<int> graph;
+    graph.add_vertex(1);
+    graph.add_vertex(2);
+    assert(graph.size() == 2);
+    assert(!graph.empty());
+    graph.remove_vertex(1);
+    assert(graph.size() == 1);
+    graph.remove_vertex(2);
+    assert(graph.empty());
+    return true;
 }
 
-bool test_SinglyLinkedList3() {
-    SinglyLinkedList<int> list1;
-    list1.insert(0, 1);
-    list1.insert(1, 2);
-    const SinglyLinkedList<int> list2 = list1;
-    return list2.get(0) == 1 && list2.get(1) == 2;
+bool test_GraphAdjacencyList3() {
+    // Test add_edge, remove_edge, and adjacent
+    GraphAdjacencyList<int> graph;
+    graph.add_vertex(1);
+    graph.add_vertex(2);
+    graph.add_edge(1, 2);
+    assert(graph.adjacent(1, 2));
+    graph.remove_edge(1, 2);
+    assert(!graph.adjacent(1, 2));
+    return true;
 }
 
-bool test_SinglyLinkedList4() {
-    SinglyLinkedList<int> list1;
-    list1.insert(0, 1);
-    list1.insert(1, 2);
-    SinglyLinkedList<int> list2;
-    list2 = list1;
-    return list2.get(0) == 1 && list2.get(1) == 2;
+bool test_GraphAdjacencyList4() {
+    // Test neighbours
+    GraphAdjacencyList<int> graph;
+    graph.add_vertex(1);
+    graph.add_vertex(2);
+    graph.add_edge(1, 2);
+    const auto neighbours = graph.neighbours(1);
+    assert(neighbours.size() == 1 && neighbours[0] == 2);
+    return true;
 }
 
-bool test_SinglyLinkedList5() {
-    SinglyLinkedList<int> list1;
-    list1.insert(0, 1);
-    list1.insert(1, 2);
-    const SinglyLinkedList<int> list2 = std::move(list1);
-    return list2.get(0) == 1 && list2.get(1) == 2 && list1.empty();
+bool test_GraphAdjacencyList5() {
+    // Test vertex_visited, set_vertex_visited, and reset_vertices_visited
+    GraphAdjacencyList<int> graph;
+    graph.add_vertex(1);
+    graph.set_vertex_visited(1, true);
+    assert(graph.vertex_visited(1));
+    graph.reset_vertices_visited();
+    assert(!graph.vertex_visited(1));
+    return true;
 }
 
-bool test_SinglyLinkedList6() {
-    SinglyLinkedList<int> list1;
-    list1.insert(0, 1);
-    list1.insert(1, 2);
-    SinglyLinkedList<int> list2;
-    list2 = std::move(list1);
-    return list2.get(0) == 1 && list2.get(1) == 2 && list1.empty();
+bool test_GraphAdjacencyMatrix1() {
+    // Test constructors, destructors, and assignment operators
+    GraphAdjacencyMatrix<int> graph1;
+    GraphAdjacencyMatrix<int> graph2(graph1);
+    GraphAdjacencyMatrix<int> const graph3(std::move(graph1));
+    graph1 = graph2;
+    graph1 = std::move(graph2);
+    return true;
 }
 
-bool test_DoublyLinkedList1() {
-    DoublyLinkedList<int> list;
-    list.insert(0, 1);
-    list.insert(1, 2);
-    list.insert(2, 3);
-    return list.get(0) == 1 && list.get(1) == 2 && list.get(2) == 3;
+bool test_GraphAdjacencyMatrix2() {
+    // Test add_vertex, remove_vertex, size, and empty
+    GraphAdjacencyMatrix<int> graph;
+    graph.add_vertex(1);
+    graph.add_vertex(2);
+    assert(graph.size() == 2);
+    assert(!graph.empty());
+    graph.remove_vertex(1);
+    assert(graph.size() == 1);
+    graph.remove_vertex(2);
+    assert(graph.empty());
+    return true;
 }
 
-bool test_DoublyLinkedList2() {
-    DoublyLinkedList<int> list;
-    list.insert(0, 1);
-    list.insert(1, 2);
-    list.insert(2, 3);
-    list.erase(1);
-    return list.get(0) == 1 && list.get(1) == 3;
+bool test_GraphAdjacencyMatrix3() {
+    // Test add_edge, remove_edge, and adjacent
+    GraphAdjacencyMatrix<int> graph;
+    graph.add_vertex(1);
+    graph.add_vertex(2);
+    graph.add_edge(1, 2);
+    assert(graph.adjacent(1, 2));
+    graph.remove_edge(1, 2);
+    assert(!graph.adjacent(1, 2));
+    return true;
 }
 
-bool test_DoublyLinkedList3() {
-    DoublyLinkedList<int> list1;
-    list1.insert(0, 1);
-    list1.insert(1, 2);
-    const DoublyLinkedList<int> list2 = list1;
-    return list2.get(0) == 1 && list2.get(1) == 2;
+bool test_GraphAdjacencyMatrix4() {
+    // Test neighbours
+    GraphAdjacencyMatrix<int> graph;
+    graph.add_vertex(1);
+    graph.add_vertex(2);
+    graph.add_edge(1, 2);
+    const auto neighbours = graph.neighbours(1);
+    assert(neighbours.size() == 1 && neighbours[0] == 2);
+    return true;
 }
 
-bool test_DoublyLinkedList4() {
-    DoublyLinkedList<int> list1;
-    list1.insert(0, 1);
-    list1.insert(1, 2);
-    DoublyLinkedList<int> list2;
-    list2 = list1;
-    return list2.get(0) == 1 && list2.get(1) == 2;
+bool test_GraphAdjacencyMatrix5() {
+    // Test vertex_visited, set_vertex_visited, and reset_vertices_visited
+    GraphAdjacencyMatrix<int> graph;
+    graph.add_vertex(1);
+    graph.set_vertex_visited(1, true);
+    assert(graph.vertex_visited(1));
+    graph.reset_vertices_visited();
+    assert(!graph.vertex_visited(1));
+    return true;
 }
 
-bool test_DoublyLinkedList5() {
-    DoublyLinkedList<int> list1;
-    list1.insert(0, 1);
-    list1.insert(1, 2);
-    const DoublyLinkedList<int> list2 = std::move(list1);
-    return list2.get(0) == 1 && list2.get(1) == 2 && list1.empty();
+bool test_GraphIncidenceMatrix1() {
+    // Test constructors, destructors, and assignment operators
+    GraphIncidenceMatrix<int> graph1;
+    GraphIncidenceMatrix<int> graph2(graph1);
+    const GraphIncidenceMatrix<int> graph3(std::move(graph1));
+    graph1 = graph2;
+    graph1 = std::move(graph2);
+    return true;
 }
 
-bool test_DoublyLinkedList6() {
-    DoublyLinkedList<int> list1;
-    list1.insert(0, 1);
-    list1.insert(1, 2);
-    DoublyLinkedList<int> list2;
-    list2 = std::move(list1);
-    return list2.get(0) == 1 && list2.get(1) == 2 && list1.empty();
+bool test_GraphIncidenceMatrix2() {
+    // Test add_vertex, remove_vertex, size, and empty
+    GraphIncidenceMatrix<int> graph;
+    graph.add_vertex(1);
+    graph.add_vertex(2);
+    assert(graph.size() == 2);
+    assert(!graph.empty());
+    graph.remove_vertex(1);
+    assert(graph.size() == 1);
+    graph.remove_vertex(2);
+    assert(graph.empty());
+    return true;
+}
+
+bool test_GraphIncidenceMatrix3() {
+    // Test add_edge, remove_edge, and adjacent
+    GraphIncidenceMatrix<int> graph;
+    graph.add_vertex(1);
+    graph.add_vertex(2);
+    graph.add_edge(1, 2);
+    assert(graph.adjacent(1, 2));
+    graph.remove_edge(1, 2);
+    assert(!graph.adjacent(1, 2));
+    return true;
+}
+
+bool test_GraphIncidenceMatrix4() {
+    // Test neighbours
+    GraphIncidenceMatrix<int> graph;
+    graph.add_vertex(1);
+    graph.add_vertex(2);
+    graph.add_edge(1, 2);
+    const auto neighbours = graph.neighbours(1);
+    assert(neighbours.size() == 1 && neighbours[0] == 2);
+    return true;
+}
+
+bool test_GraphIncidenceMatrix5() {
+    // Test vertex_visited, set_vertex_visited, and reset_vertices_visited
+    GraphIncidenceMatrix<int> graph;
+    graph.add_vertex(1);
+    graph.set_vertex_visited(1, true);
+    assert(graph.vertex_visited(1));
+    graph.reset_vertices_visited();
+    assert(!graph.vertex_visited(1));
+    return true;
 }
