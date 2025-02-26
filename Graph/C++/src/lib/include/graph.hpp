@@ -188,12 +188,16 @@ public:
         }
         _vertices.erase(id);
         for (std::pair<const size_t, Vertex>& vertexGraph : _vertices) {
-            vertexGraph.second._neighbours.erase(id);
-            for (size_t& neighbourId : vertexGraph.second._neighbours) {
-                if (neighbourId > id) {
-                    neighbourId--;
+            std::unordered_set<size_t> newNeighbours;
+            newNeighbours.reserve(vertexGraph.second._neighbours.size());
+            for (const size_t& neighbourId : vertexGraph.second._neighbours) {
+                if (neighbourId < id) {
+                    newNeighbours.insert(neighbourId);
+                } else if (neighbourId > id) {
+                    newNeighbours.insert(neighbourId - 1);
                 }
             }
+            vertexGraph.second._neighbours = std::move(newNeighbours);
         }
     }
 
@@ -500,8 +504,8 @@ public:
     void add_vertex(const T& vertex) override {
         const size_t id = _vertices.size();
         _vertices2ids[vertex] = id;
-        const Vertex newVertex{vertex};
-        _vertices[id] = newVertex;
+        Vertex newVertex{vertex};
+        _vertices[id] = std::move(newVertex);
         _inc_matrix = static_cast<double*>(realloc(_inc_matrix, size() * edge_count() * sizeof(double)));
         if (_inc_matrix == nullptr) {
             throw std::bad_alloc();
@@ -557,8 +561,8 @@ public:
     }
 
     void reset_vertices_visited() override {
-        for (std::pair<size_t, Vertex>& pair : _vertices) {
-            pair.second._visited = false;
+        for (const std::pair<const size_t, Vertex>& pair : _vertices) {
+            _vertices[pair.first]._visited = false;
         }
     }
 
