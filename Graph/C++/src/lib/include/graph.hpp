@@ -116,6 +116,7 @@ private:
         std::unordered_set<size_t> _neighbours;
         bool _visited = false;
 
+        Vertex() : _value() {}
         explicit Vertex(const T& value) : _value(value) {}
     };
 
@@ -172,30 +173,38 @@ public:
     }
 
     void add_vertex(const T& vertex) override {
-        const Vertex newVertex{vertex};
         const size_t newId = _vertices.size();
         _vertices2ids[vertex] = newId;
-        _vertices[newId] = newVertex;
+        _vertices[newId] = Vertex{vertex};
     }
 
     void remove_vertex(const T& vertex) override {
         const size_t id = _vertices2ids.at(vertex);
         _vertices2ids.erase(vertex);
+        _vertices.erase(id);
+
+        // update ids in _vertices2ids
         for (std::pair<const T, size_t>& vertex2id : _vertices2ids) {
             if (vertex2id.second > id) {
                 vertex2id.second--;
             }
         }
-        _vertices.erase(id);
+
+        // update ids in _vertices
+        std::unordered_map<size_t, Vertex> newVertices;
+        newVertices.reserve(_vertices.size());
         for (std::pair<const size_t, Vertex>& vertexGraph : _vertices) {
+            newVertices[vertexGraph.first < id ? vertexGraph.first : vertexGraph.first - 1] = std::move(vertexGraph.second);
+        }
+        _vertices = std::move(newVertices);
+
+        // update ids in neighbours lists
+        for (std::pair<const size_t, Vertex>& vertexGraph : _vertices) {
+            vertexGraph.second._neighbours.erase(id);
             std::unordered_set<size_t> newNeighbours;
             newNeighbours.reserve(vertexGraph.second._neighbours.size());
             for (const size_t& neighbourId : vertexGraph.second._neighbours) {
-                if (neighbourId < id) {
-                    newNeighbours.insert(neighbourId);
-                } else if (neighbourId > id) {
-                    newNeighbours.insert(neighbourId - 1);
-                }
+                newNeighbours.insert(neighbourId < id ? neighbourId : neighbourId - 1);
             }
             vertexGraph.second._neighbours = std::move(newNeighbours);
         }
@@ -236,6 +245,8 @@ private:
     struct Vertex {
         T _value;
         bool _visited = false;
+
+        Vertex() : _value() {}
         explicit Vertex(const T& value) : _value(value) {}
     };
 
@@ -313,16 +324,23 @@ public:
     void add_vertex(const T& vertex) override {
         const size_t oldSize = size();
         _vertices2ids[vertex] = oldSize;
-        const Vertex newVertex{vertex};
-        _vertices[oldSize] = newVertex;
+        _vertices[oldSize] = Vertex{vertex};
         _adj_matrix = static_cast<double*>(realloc(_adj_matrix, size() * size() * sizeof(double)));
         if (_adj_matrix == nullptr) {
             throw std::bad_alloc();
         }
-        for (size_t i = size() - 2; i != static_cast<size_t>(-1); i++) {
-            for (size_t j = size() - 2; j != static_cast<size_t>(-1); j++) {
+        // move old data to new positions
+        for (size_t i = size() - 2; i != static_cast<size_t>(-1); i--) {
+            for (size_t j = size() - 2; j != static_cast<size_t>(-1); j--) {
                 _adj_matrix[i * size() + j] = _adj_matrix[i * oldSize + j];
             }
+        }
+        // set new row and column to 0
+        for (size_t i = 0; i < size(); i++) {
+            _adj_matrix[i * size() + size() - 1] = 0;
+        }
+        for (size_t j = 0; j < size(); j++) {
+            _adj_matrix[(size() - 1) * size() + j] = 0;
         }
     }
 
@@ -331,6 +349,23 @@ public:
         const size_t id = _vertices2ids.at(vertex);
         _vertices2ids.erase(vertex);
         _vertices.erase(id);
+
+        // update ids in _vertices2ids
+        for (std::pair<const T, size_t>& vertex2id : _vertices2ids) {
+            if (vertex2id.second > id) {
+                vertex2id.second--;
+            }
+        }
+
+        // update ids in _vertices
+        std::unordered_map<size_t, Vertex> newVertices;
+        newVertices.reserve(_vertices.size());
+        for (std::pair<const size_t, Vertex>& vertexGraph : _vertices) {
+            newVertices[vertexGraph.first < id ? vertexGraph.first : vertexGraph.first - 1] = std::move(vertexGraph.second);
+        }
+        _vertices = std::move(newVertices);
+
+        // update adjacency matrix (remove row and column for the removed vertex)
         double* _adj_matrix_ptr = _adj_matrix;
         for (size_t i = 0; i < oldSize; i++) {
             if (i == id) {
@@ -343,9 +378,15 @@ public:
                 *(_adj_matrix_ptr++) = _adj_matrix[i * oldSize + j];
             }
         }
-        _adj_matrix = static_cast<double*>(realloc(_adj_matrix, size() * size() * sizeof(double)));
-        if (_adj_matrix == nullptr) {
-            throw std::bad_alloc();
+        const size_t newMatSize = size() * size() * sizeof(double);
+        if (newMatSize != 0) {
+            _adj_matrix = static_cast<double*>(realloc(_adj_matrix, newMatSize));
+            if (_adj_matrix == nullptr) {
+                throw std::bad_alloc();
+            }
+        } else {
+            free(_adj_matrix);
+            _adj_matrix = nullptr;
         }
     }
 
@@ -404,6 +445,8 @@ private:
     struct Vertex {
         T _value;
         bool _visited = false;
+
+        Vertex() : _value() {}
         explicit Vertex(const T& value) : _value(value) {}
     };
 
@@ -477,8 +520,8 @@ public:
     [[nodiscard]] bool adjacent(const T& vertex1, const T& vertex2) const override {
         const size_t id1 = _vertices2ids.at(vertex1);
         const size_t id2 = _vertices2ids.at(vertex2);
-        for (int j = 0; j < edge_count(); j++) {
-            if (_inc_matrix[id1 * edge_count() + j] > 0 && _inc_matrix[id2 * edge_count() + j] < 0) {
+        for (int j = 0; j < _edgeCount; j++) {
+            if (_inc_matrix[id1 * _edgeCount + j] > 0 && _inc_matrix[id2 * _edgeCount + j] < 0) {
                 return true;
             }
         }
@@ -488,10 +531,10 @@ public:
     [[nodiscard]] std::vector<T> neighbours(const T& vertex) const override {
         std::vector<T> neighboursVec;
         const size_t id = _vertices2ids.at(vertex);
-        for (int j = 0; j < edge_count(); j++) {
-            if (_inc_matrix[id * edge_count() + j] > 0) {
+        for (int j = 0; j < _edgeCount; j++) {
+            if (_inc_matrix[id * _edgeCount + j] > 0) {
                 for (int i = 0; i < size(); i++) {
-                    if (_inc_matrix[i * edge_count() + j] < 0) {
+                    if (_inc_matrix[i * _edgeCount + j] < 0) {
                         neighboursVec.push_back(_vertices.at(i)._value);
                         break;
                     }
@@ -504,11 +547,21 @@ public:
     void add_vertex(const T& vertex) override {
         const size_t id = _vertices.size();
         _vertices2ids[vertex] = id;
-        Vertex newVertex{vertex};
-        _vertices[id] = std::move(newVertex);
-        _inc_matrix = static_cast<double*>(realloc(_inc_matrix, size() * edge_count() * sizeof(double)));
-        if (_inc_matrix == nullptr) {
-            throw std::bad_alloc();
+        _vertices[id] = Vertex{vertex};
+        const size_t newMatSize = size() * _edgeCount * sizeof(double);
+        if (newMatSize != 0) {
+            _inc_matrix = static_cast<double*>(realloc(_inc_matrix, newMatSize));
+            if (_inc_matrix == nullptr) {
+                throw std::bad_alloc();
+            }
+        } else {
+            free(_inc_matrix);
+            _inc_matrix = nullptr;
+        }
+
+        // zero the new row
+        for (int j = 0; j < _edgeCount; j++) {
+            _inc_matrix[id * _edgeCount + j] = 0;
         }
     }
 
@@ -517,28 +570,34 @@ public:
         _vertices2ids.erase(vertex);
         _vertices.erase(id);
 
-        int i = 0;
-        for (int j = 0; j < edge_count(); j++) {
-            if (_inc_matrix[id * edge_count() + j] == 0) {
-                for (int k = 0; k < size(); k++) {
-                    _inc_matrix[k * edge_count() + i] = _inc_matrix[k * edge_count() + j];
+        size_t i = 0;
+        for (size_t j = 0; j < _edgeCount; j++) {
+            if (_inc_matrix[id * _edgeCount + j] == 0) {
+                for (size_t k = 0; k < size(); k++) {
+                    _inc_matrix[k * _edgeCount + i] = _inc_matrix[k * _edgeCount + j];
                 }
                 i++;
             }
         }
-        const int removed_edges = edge_count() - i;
+        const size_t removed_edges = _edgeCount - i;
         i = 0;
-        for (int j = 0; j < size(); j++) {
+        for (size_t j = 0; j < size(); j++) {
             if (j != id) {
-                std::copy(&_inc_matrix[j * edge_count()], &_inc_matrix[(j + 1) * edge_count()], &_inc_matrix[i]);
-                i += edge_count() - removed_edges;
+                std::copy(&_inc_matrix[j * _edgeCount], &_inc_matrix[(j + 1) * _edgeCount], &_inc_matrix[i]);
+                i += _edgeCount - removed_edges;
             }
         }
         _edgeCount -= removed_edges;
 
-        _inc_matrix = static_cast<double*>(realloc(_inc_matrix, size() * edge_count() * sizeof(double)));
-        if (_inc_matrix == nullptr) {
-            throw std::bad_alloc();
+        const size_t newMatSize = size() * _edgeCount * sizeof(double);
+        if (newMatSize != 0) {
+            _inc_matrix = static_cast<double*>(realloc(_inc_matrix, newMatSize));
+            if (_inc_matrix == nullptr) {
+                throw std::bad_alloc();
+            }
+        } else {
+            free(_inc_matrix);
+            _inc_matrix = nullptr;
         }
     }
 
@@ -575,9 +634,9 @@ public:
     [[nodiscard]] double get_edge_value(const T& vertex1, const T& vertex2) const {
         const size_t id1 = _vertices2ids.at(vertex1);
         const size_t id2 = _vertices2ids.at(vertex2);
-        for (int j = 0; j < edge_count(); j++) {
-            if (_inc_matrix[id1 * edge_count() + j] > 0 && _inc_matrix[id2 * edge_count() + j] < 0) {
-                return _inc_matrix[id1 * edge_count() + j];
+        for (int j = 0; j < _edgeCount; j++) {
+            if (_inc_matrix[id1 * _edgeCount + j] > 0 && _inc_matrix[id2 * _edgeCount + j] < 0) {
+                return _inc_matrix[id1 * _edgeCount + j];
             }
         }
         return 0;
@@ -593,26 +652,64 @@ public:
         const size_t id1 = _vertices2ids.at(vertex1);
         const size_t id2 = _vertices2ids.at(vertex2);
 
+        // if weight is 0, remove edge if it is present
+        if (weight == 0) {
+            size_t i = 0;
+            for (size_t j = 0; j < _edgeCount; j++) {
+                if (_inc_matrix[id1 * _edgeCount + j] == 0 || _inc_matrix[id2 * _edgeCount + j] == 0) {
+                    for (size_t k = 0; k < size(); k++) {
+                        _inc_matrix[k * _edgeCount + i] = _inc_matrix[k * _edgeCount + j];
+                    }
+                    i++;
+                }
+            }
+            const size_t removed_edges = _edgeCount - i;
+            if (removed_edges == 1) {
+                i = 0;
+                for (size_t j = 0; j < size(); j++) {
+                    std::copy(&_inc_matrix[j * _edgeCount], &_inc_matrix[(j + 1) * _edgeCount - removed_edges], &_inc_matrix[i]);
+                    i += _edgeCount - removed_edges;
+                }
+                _edgeCount -= removed_edges;
+            }
+            return;
+        }
+
         // update edge if it is already in the incidence matrix
-        for (int j = 0; j < edge_count(); j++) {
-            if (_inc_matrix[id1 * edge_count() + j] > 0 && _inc_matrix[id2 * edge_count() + j] < 0) {
-                _inc_matrix[id1 * edge_count() + j] = weight;
-                _inc_matrix[id2 * edge_count() + j] = -weight;
+        for (int j = 0; j < _edgeCount; j++) {
+            if (_inc_matrix[id1 * _edgeCount + j] > 0 && _inc_matrix[id2 * _edgeCount + j] < 0) {
+                _inc_matrix[id1 * _edgeCount + j] = weight;
+                _inc_matrix[id2 * _edgeCount + j] = -weight;
                 return;
             }
         }
 
         // if edge is not in incidence matrix
         _edgeCount++;
-        _inc_matrix = static_cast<double*>(realloc(_inc_matrix, size() * edge_count() * sizeof(double)));
-        if (_inc_matrix == nullptr) {
-            throw std::bad_alloc();
+        const size_t newMatSize = size() * _edgeCount * sizeof(double);
+        if (newMatSize != 0) {
+            _inc_matrix = static_cast<double*>(realloc(_inc_matrix, newMatSize));
+            if (_inc_matrix == nullptr) {
+                throw std::bad_alloc();
+            }
+        } else {
+            free(_inc_matrix);
+            _inc_matrix = nullptr;
         }
-        for (size_t i = size() - 1; i != static_cast<size_t>(-1); i++) {
-            for (size_t j = edge_count() - 2; j != static_cast<size_t>(-1); j++) {
-                _inc_matrix[i * edge_count() + j] = _inc_matrix[i * (edge_count() - 1) + j];
+
+        // copy old data to new positions
+        for (size_t i = size() - 1; i != static_cast<size_t>(-1); i--) {
+            for (size_t j = _edgeCount - 2; j != static_cast<size_t>(-1); j--) {
+                _inc_matrix[i * _edgeCount + j] = _inc_matrix[i * (_edgeCount - 1) + j];
             }
         }
+        // set new column to 0
+        for (size_t i = 0; i < size(); i++) {
+            _inc_matrix[i * _edgeCount + _edgeCount - 1] = 0;
+        }
+        // set new edge
+        _inc_matrix[id1 * _edgeCount + _edgeCount - 1] = weight;
+        _inc_matrix[id2 * _edgeCount + _edgeCount - 1] = -weight;
     }
 };
 

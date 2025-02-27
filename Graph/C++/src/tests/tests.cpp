@@ -51,11 +51,24 @@ int main(const int argc, char *argv[]) {
 bool test_GraphAdjacencyList1() {
     // Test constructors, destructors, and assignment operators
     GraphAdjacencyList<int> graph1;
-    GraphAdjacencyList<int> graph2(graph1);
-    const GraphAdjacencyList<int> graph3(std::move(graph1));
+    graph1.add_vertex(1);
+    graph1.add_vertex(2);
+    graph1.add_edge(1, 2);
+    graph1.add_edge(2, 1);
+    GraphAdjacencyList<int> graph2{graph1};
+    if (!graph2.adjacent(1, 2) || !graph2.adjacent(2, 1)) {
+        return false;
+    }
+    const GraphAdjacencyList<int> graph3{std::move(graph1)};
+    if (!graph3.adjacent(1, 2) || !graph3.adjacent(2, 1)) {
+        return false;
+    }
     graph1 = graph2;
+    if (!graph1.adjacent(1, 2) || !graph1.adjacent(2, 1)) {
+        return false;
+    }
     graph1 = std::move(graph2);
-    return true;
+    return graph1.adjacent(1, 2) && graph1.adjacent(2, 1);
 }
 
 bool test_GraphAdjacencyList2() {
@@ -63,13 +76,15 @@ bool test_GraphAdjacencyList2() {
     GraphAdjacencyList<int> graph;
     graph.add_vertex(1);
     graph.add_vertex(2);
-    assert(graph.size() == 2);
-    assert(!graph.empty());
+    if (graph.size() != 2 || graph.empty()) {
+        return false;
+    }
     graph.remove_vertex(1);
-    assert(graph.size() == 1);
+    if (graph.size() != 1 || graph.empty()) {
+        return false;
+    }
     graph.remove_vertex(2);
-    assert(graph.empty());
-    return true;
+    return graph.empty();
 }
 
 bool test_GraphAdjacencyList3() {
@@ -121,13 +136,15 @@ bool test_GraphAdjacencyMatrix2() {
     GraphAdjacencyMatrix<int> graph;
     graph.add_vertex(1);
     graph.add_vertex(2);
-    assert(graph.size() == 2);
-    assert(!graph.empty());
+    if (graph.size() != 2 || graph.empty()) {
+        return false;
+    }
     graph.remove_vertex(1);
-    assert(graph.size() == 1);
+    if (graph.size() != 1 || graph.empty()) {
+        return false;
+    }
     graph.remove_vertex(2);
-    assert(graph.empty());
-    return true;
+    return graph.empty();
 }
 
 bool test_GraphAdjacencyMatrix3() {
