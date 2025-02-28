@@ -1,12 +1,38 @@
 #ifndef GRAPH_HPP
 #define GRAPH_HPP
 
+#include <exception>
 #include <memory>
 #include <ranges>
 #include <stdexcept>
+#include <string>
 #include <unordered_map>
 #include <unordered_set>
+#include <utility>
 #include <vector>
+
+class GraphException : public std::exception {
+private:
+    std::string _message;
+public:
+    explicit GraphException(std::string  message) : _message(std::move(message)) {}
+
+    [[nodiscard]] const char* what() const noexcept override {
+        return _message.c_str();
+    }
+};
+class VertexNotFoundException : public GraphException {
+public:
+    explicit VertexNotFoundException(const std::string& message) : GraphException(message) {}
+};
+class EdgeNotFoundException : public GraphException {
+public:
+    explicit EdgeNotFoundException(const std::string& message) : GraphException(message) {}
+};
+class VertexAlreadyExistsException : public GraphException {
+public:
+    explicit VertexAlreadyExistsException(const std::string& message) : GraphException(message) {}
+};
 
 template <typename T>
 class Graph {
@@ -67,7 +93,7 @@ public:
 
     /**
      * Remove a vertex from the graph
-     * If the vertex does not exist, nothing happens
+     * If the vertex does not exist, throws an exception
      * @param vertex the vertex to remove
      */
     virtual void remove_vertex(const T& vertex) = 0;
@@ -173,12 +199,18 @@ public:
     }
 
     void add_vertex(const T& vertex) override {
+        if (_vertices2ids.contains(vertex)) {
+            throw VertexAlreadyExistsException("Vertex already exists");
+        }
         const size_t newId = _vertices.size();
         _vertices2ids[vertex] = newId;
         _vertices[newId] = Vertex{vertex};
     }
 
     void remove_vertex(const T& vertex) override {
+        if (!_vertices2ids.contains(vertex)) {
+            throw VertexNotFoundException("Vertex not found");
+        }
         const size_t id = _vertices2ids.at(vertex);
         _vertices2ids.erase(vertex);
         _vertices.erase(id);
@@ -276,6 +308,7 @@ public:
             return *this;
         _vertices2ids = other._vertices2ids;
         _vertices = other._vertices;
+        free(_adj_matrix);
         _adj_matrix = static_cast<double*>(malloc(other.size() * other.size() * sizeof(double)));
         if (_adj_matrix == nullptr) {
             throw std::bad_alloc();
@@ -290,6 +323,7 @@ public:
             return *this;
         _vertices2ids = std::move(other._vertices2ids);
         _vertices = std::move(other._vertices);
+        free(_adj_matrix);
         _adj_matrix = other._adj_matrix;
         other._adj_matrix = nullptr;
         return *this;
@@ -322,6 +356,9 @@ public:
     }
 
     void add_vertex(const T& vertex) override {
+        if (_vertices2ids.contains(vertex)) {
+            throw VertexAlreadyExistsException("Vertex already exists");
+        }
         const size_t oldSize = size();
         _vertices2ids[vertex] = oldSize;
         _vertices[oldSize] = Vertex{vertex};
@@ -345,6 +382,9 @@ public:
     }
 
     void remove_vertex(const T& vertex) override {
+        if (!_vertices2ids.contains(vertex)) {
+            throw VertexNotFoundException("Vertex not found");
+        }
         const size_t oldSize = size();
         const size_t id = _vertices2ids.at(vertex);
         _vertices2ids.erase(vertex);
@@ -479,6 +519,7 @@ public:
         _vertices2ids = other._vertices2ids;
         _vertices = other._vertices;
         _edgeCount = other._edgeCount;
+        free(_inc_matrix);
         _inc_matrix = static_cast<double*>(malloc(other.size() * other.edge_count() * sizeof(double)));
         if (_inc_matrix == nullptr) {
             throw std::bad_alloc();
@@ -494,6 +535,7 @@ public:
         _vertices2ids = std::move(other._vertices2ids);
         _vertices = std::move(other._vertices);
         _edgeCount = other._edgeCount;
+        free(_inc_matrix);
         _inc_matrix = other._inc_matrix;
         other._inc_matrix = nullptr;
         other._edgeCount = 0;
@@ -545,6 +587,9 @@ public:
     }
 
     void add_vertex(const T& vertex) override {
+        if (_vertices2ids.contains(vertex)) {
+            throw VertexAlreadyExistsException("Vertex already exists");
+        }
         const size_t id = _vertices.size();
         _vertices2ids[vertex] = id;
         _vertices[id] = Vertex{vertex};
@@ -554,21 +599,38 @@ public:
             if (_inc_matrix == nullptr) {
                 throw std::bad_alloc();
             }
+            // zero the new row
+            for (int j = 0; j < _edgeCount; j++) {
+                _inc_matrix[id * _edgeCount + j] = 0;
+            }
         } else {
             free(_inc_matrix);
             _inc_matrix = nullptr;
         }
-
-        // zero the new row
-        for (int j = 0; j < _edgeCount; j++) {
-            _inc_matrix[id * _edgeCount + j] = 0;
-        }
     }
 
     void remove_vertex(const T& vertex) override {
+        if (!_vertices2ids.contains(vertex)) {
+            throw VertexNotFoundException("Vertex not found");
+        }
         const size_t id = _vertices2ids.at(vertex);
         _vertices2ids.erase(vertex);
         _vertices.erase(id);
+
+        // update ids in _vertices2ids
+        for (std::pair<const T, size_t>& vertex2id : _vertices2ids) {
+            if (vertex2id.second > id) {
+                vertex2id.second--;
+            }
+        }
+
+        // update ids in _vertices
+        std::unordered_map<size_t, Vertex> newVertices;
+        newVertices.reserve(_vertices.size());
+        for (std::pair<const size_t, Vertex>& vertexGraph : _vertices) {
+            newVertices[vertexGraph.first < id ? vertexGraph.first : vertexGraph.first - 1] = std::move(vertexGraph.second);
+        }
+        _vertices = std::move(newVertices);
 
         size_t i = 0;
         for (size_t j = 0; j < _edgeCount; j++) {
@@ -656,7 +718,7 @@ public:
         if (weight == 0) {
             size_t i = 0;
             for (size_t j = 0; j < _edgeCount; j++) {
-                if (_inc_matrix[id1 * _edgeCount + j] == 0 || _inc_matrix[id2 * _edgeCount + j] == 0) {
+                if (_inc_matrix[id1 * _edgeCount + j] <= 0 && _inc_matrix[id2 * _edgeCount + j] >= 0) {
                     for (size_t k = 0; k < size(); k++) {
                         _inc_matrix[k * _edgeCount + i] = _inc_matrix[k * _edgeCount + j];
                     }

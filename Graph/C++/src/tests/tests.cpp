@@ -83,7 +83,15 @@ bool test_GraphAdjacencyList2() {
     if (graph.size() != 1 || graph.empty()) {
         return false;
     }
+    graph.add_vertex(3);
+    if (graph.size() != 2 || graph.empty()) {
+        return false;
+    }
     graph.remove_vertex(2);
+    if (graph.size() != 1 || graph.empty()) {
+        return false;
+    }
+    graph.remove_vertex(3);
     return graph.empty();
 }
 
@@ -93,10 +101,17 @@ bool test_GraphAdjacencyList3() {
     graph.add_vertex(1);
     graph.add_vertex(2);
     graph.add_edge(1, 2);
-    assert(graph.adjacent(1, 2));
+    if (!graph.adjacent(1, 2) || graph.adjacent(2, 1)) { return false; }
+    graph.add_edge(2, 1);
+    if (!graph.adjacent(1, 2) || !graph.adjacent(2, 1)) { return false; }
+    graph.add_vertex(3);
+    if (graph.adjacent(1, 3) || graph.adjacent(3, 1) || graph.adjacent(2, 3) || graph.adjacent(3, 2)) {
+        return false;
+    }
     graph.remove_edge(1, 2);
-    assert(!graph.adjacent(1, 2));
-    return true;
+    if (graph.adjacent(1, 2) || !graph.adjacent(2, 1)) { return false; }
+    graph.remove_vertex(2);
+    return !graph.adjacent(1, 3) && !graph.adjacent(3, 1);
 }
 
 bool test_GraphAdjacencyList4() {
@@ -115,20 +130,40 @@ bool test_GraphAdjacencyList5() {
     GraphAdjacencyList<int> graph;
     graph.add_vertex(1);
     graph.set_vertex_visited(1, true);
-    assert(graph.vertex_visited(1));
+    if (!graph.vertex_visited(1)) {
+        return false;
+    }
+    graph.set_vertex_visited(1, false);
+    graph.add_vertex(2);
+    graph.set_vertex_visited(2, true);
+    if (!graph.vertex_visited(2) || graph.vertex_visited(1)) {
+        return false;
+    }
     graph.reset_vertices_visited();
-    assert(!graph.vertex_visited(1));
-    return true;
+    return !graph.vertex_visited(1) && !graph.vertex_visited(2);
 }
 
 bool test_GraphAdjacencyMatrix1() {
     // Test constructors, destructors, and assignment operators
     GraphAdjacencyMatrix<int> graph1;
-    GraphAdjacencyMatrix<int> graph2(graph1);
-    GraphAdjacencyMatrix<int> const graph3(std::move(graph1));
+    graph1.add_vertex(1);
+    graph1.add_vertex(2);
+    graph1.add_edge(1, 2);
+    graph1.add_edge(2, 1);
+    GraphAdjacencyMatrix<int> graph2{graph1};
+    if (!graph2.adjacent(1, 2) || !graph2.adjacent(2, 1)) {
+        return false;
+    }
+    const GraphAdjacencyMatrix<int> graph3{std::move(graph1)};
+    if (!graph3.adjacent(1, 2) || !graph3.adjacent(2, 1)) {
+        return false;
+    }
     graph1 = graph2;
+    if (!graph1.adjacent(1, 2) || !graph1.adjacent(2, 1)) {
+        return false;
+    }
     graph1 = std::move(graph2);
-    return true;
+    return graph1.adjacent(1, 2) && graph1.adjacent(2, 1);
 }
 
 bool test_GraphAdjacencyMatrix2() {
@@ -143,7 +178,15 @@ bool test_GraphAdjacencyMatrix2() {
     if (graph.size() != 1 || graph.empty()) {
         return false;
     }
+    graph.add_vertex(3);
+    if (graph.size() != 2 || graph.empty()) {
+        return false;
+    }
     graph.remove_vertex(2);
+    if (graph.size() != 1 || graph.empty()) {
+        return false;
+    }
+    graph.remove_vertex(3);
     return graph.empty();
 }
 
@@ -153,10 +196,13 @@ bool test_GraphAdjacencyMatrix3() {
     graph.add_vertex(1);
     graph.add_vertex(2);
     graph.add_edge(1, 2);
-    assert(graph.adjacent(1, 2));
+    if (!graph.adjacent(1, 2) || graph.adjacent(2, 1)) { return false; }
+    graph.add_edge(2, 1);
+    if (!graph.adjacent(1, 2) || !graph.adjacent(2, 1)) { return false; }
     graph.remove_edge(1, 2);
-    assert(!graph.adjacent(1, 2));
-    return true;
+    if (graph.adjacent(1, 2) || !graph.adjacent(2, 1)) { return false; }
+    graph.remove_edge(2, 1);
+    return !graph.adjacent(1, 2) && !graph.adjacent(2, 1);
 }
 
 bool test_GraphAdjacencyMatrix4() {
@@ -175,20 +221,40 @@ bool test_GraphAdjacencyMatrix5() {
     GraphAdjacencyMatrix<int> graph;
     graph.add_vertex(1);
     graph.set_vertex_visited(1, true);
-    assert(graph.vertex_visited(1));
+    if (!graph.vertex_visited(1)) {
+        return false;
+    }
+    graph.set_vertex_visited(1, false);
+    graph.add_vertex(2);
+    graph.set_vertex_visited(2, true);
+    if (!graph.vertex_visited(2) || graph.vertex_visited(1)) {
+        return false;
+    }
     graph.reset_vertices_visited();
-    assert(!graph.vertex_visited(1));
-    return true;
+    return !graph.vertex_visited(1) && !graph.vertex_visited(2);
 }
 
 bool test_GraphIncidenceMatrix1() {
     // Test constructors, destructors, and assignment operators
     GraphIncidenceMatrix<int> graph1;
-    GraphIncidenceMatrix<int> graph2(graph1);
-    const GraphIncidenceMatrix<int> graph3(std::move(graph1));
+    graph1.add_vertex(1);
+    graph1.add_vertex(2);
+    graph1.add_edge(1, 2);
+    graph1.add_edge(2, 1);
+    GraphIncidenceMatrix<int> graph2{graph1};
+    if (!graph2.adjacent(1, 2) || !graph2.adjacent(2, 1)) {
+        return false;
+    }
+    const GraphIncidenceMatrix<int> graph3{std::move(graph1)};
+    if (!graph3.adjacent(1, 2) || !graph3.adjacent(2, 1)) {
+        return false;
+    }
     graph1 = graph2;
+    if (!graph1.adjacent(1, 2) || !graph1.adjacent(2, 1)) {
+        return false;
+    }
     graph1 = std::move(graph2);
-    return true;
+    return graph1.adjacent(1, 2) && graph1.adjacent(2, 1);
 }
 
 bool test_GraphIncidenceMatrix2() {
@@ -196,13 +262,23 @@ bool test_GraphIncidenceMatrix2() {
     GraphIncidenceMatrix<int> graph;
     graph.add_vertex(1);
     graph.add_vertex(2);
-    assert(graph.size() == 2);
-    assert(!graph.empty());
+    if (graph.size() != 2 || graph.empty()) {
+        return false;
+    }
     graph.remove_vertex(1);
-    assert(graph.size() == 1);
+    if (graph.size() != 1 || graph.empty()) {
+        return false;
+    }
+    graph.add_vertex(3);
+    if (graph.size() != 2 || graph.empty()) {
+        return false;
+    }
     graph.remove_vertex(2);
-    assert(graph.empty());
-    return true;
+    if (graph.size() != 1 || graph.empty()) {
+        return false;
+    }
+    graph.remove_vertex(3);
+    return graph.empty();
 }
 
 bool test_GraphIncidenceMatrix3() {
@@ -211,10 +287,13 @@ bool test_GraphIncidenceMatrix3() {
     graph.add_vertex(1);
     graph.add_vertex(2);
     graph.add_edge(1, 2);
-    assert(graph.adjacent(1, 2));
+    if (!graph.adjacent(1, 2) || graph.adjacent(2, 1)) { return false; }
+    graph.add_edge(2, 1);
+    if (!graph.adjacent(1, 2) || !graph.adjacent(2, 1)) { return false; }
     graph.remove_edge(1, 2);
-    assert(!graph.adjacent(1, 2));
-    return true;
+    if (graph.adjacent(1, 2) || !graph.adjacent(2, 1)) { return false; }
+    graph.remove_edge(2, 1);
+    return !graph.adjacent(1, 2) && !graph.adjacent(2, 1);
 }
 
 bool test_GraphIncidenceMatrix4() {
@@ -233,8 +312,15 @@ bool test_GraphIncidenceMatrix5() {
     GraphIncidenceMatrix<int> graph;
     graph.add_vertex(1);
     graph.set_vertex_visited(1, true);
-    assert(graph.vertex_visited(1));
+    if (!graph.vertex_visited(1)) {
+        return false;
+    }
+    graph.set_vertex_visited(1, false);
+    graph.add_vertex(2);
+    graph.set_vertex_visited(2, true);
+    if (!graph.vertex_visited(2) || graph.vertex_visited(1)) {
+        return false;
+    }
     graph.reset_vertices_visited();
-    assert(!graph.vertex_visited(1));
-    return true;
+    return !graph.vertex_visited(1) && !graph.vertex_visited(2);
 }
