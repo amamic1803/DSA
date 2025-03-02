@@ -1,8 +1,9 @@
 #include "graph.hpp"
 #include "tests.hpp"
-#include <cassert>
+#include <algorithm>
 #include <string>
 #include <utility>
+#include <vector>
 
 int main(const int argc, char *argv[]) {
     if (argc != 2) {
@@ -119,10 +120,19 @@ bool test_GraphAdjacencyList4() {
     GraphAdjacencyList<int> graph;
     graph.add_vertex(1);
     graph.add_vertex(2);
+    graph.add_vertex(4);
     graph.add_edge(1, 2);
-    const auto neighbours = graph.neighbours(1);
-    assert(neighbours.size() == 1 && neighbours[0] == 2);
-    return true;
+    graph.add_edge(2, 4);
+    graph.add_edge(1, 4);
+    auto neighbours1 = graph.neighbours(1);
+    std::ranges::sort(neighbours1);
+    const std::vector<int> expectedNeighbours1{2, 4};
+    if (neighbours1 != expectedNeighbours1) {
+        return false;
+    }
+    const auto neighbours2 = graph.neighbours(2);
+    const std::vector<int> expectedNeighbours2{4};
+    return neighbours2 == expectedNeighbours2;
 }
 
 bool test_GraphAdjacencyList5() {
@@ -210,10 +220,19 @@ bool test_GraphAdjacencyMatrix4() {
     GraphAdjacencyMatrix<int> graph;
     graph.add_vertex(1);
     graph.add_vertex(2);
+    graph.add_vertex(4);
     graph.add_edge(1, 2);
-    const auto neighbours = graph.neighbours(1);
-    assert(neighbours.size() == 1 && neighbours[0] == 2);
-    return true;
+    graph.add_edge(2, 4);
+    graph.add_edge(1, 4);
+    auto neighbours1 = graph.neighbours(1);
+    std::ranges::sort(neighbours1);
+    const std::vector<int> expectedNeighbours1{2, 4};
+    if (neighbours1 != expectedNeighbours1) {
+        return false;
+    }
+    const auto neighbours2 = graph.neighbours(2);
+    const std::vector<int> expectedNeighbours2{4};
+    return neighbours2 == expectedNeighbours2;
 }
 
 bool test_GraphAdjacencyMatrix5() {
@@ -301,10 +320,19 @@ bool test_GraphIncidenceMatrix4() {
     GraphIncidenceMatrix<int> graph;
     graph.add_vertex(1);
     graph.add_vertex(2);
+    graph.add_vertex(4);
     graph.add_edge(1, 2);
-    const auto neighbours = graph.neighbours(1);
-    assert(neighbours.size() == 1 && neighbours[0] == 2);
-    return true;
+    graph.add_edge(2, 4);
+    graph.add_edge(1, 4);
+    auto neighbours1 = graph.neighbours(1);
+    std::ranges::sort(neighbours1);
+    const std::vector<int> expectedNeighbours1{2, 4};
+    if (neighbours1 != expectedNeighbours1) {
+        return false;
+    }
+    const auto neighbours2 = graph.neighbours(2);
+    const std::vector<int> expectedNeighbours2{4};
+    return neighbours2 == expectedNeighbours2;
 }
 
 bool test_GraphIncidenceMatrix5() {
