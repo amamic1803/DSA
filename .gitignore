@@ -1,13 +1,10 @@
 # Build directories
-build/
-target/
+build*/
+target*/
+cmake-build*/
 
 # Cargo
 Cargo.lock
-
-# CMake
-cmake-build-debug/
-cmake-build-release/
 
 # Git
 .git/

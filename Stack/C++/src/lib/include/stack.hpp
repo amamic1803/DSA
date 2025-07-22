@@ -1,5 +1,5 @@
-#ifndef STACK_LIB_HPP
-#define STACK_LIB_HPP
+#ifndef STACK_HPP
+#define STACK_HPP
 
 
 #include <algorithm>
@@ -10,7 +10,7 @@
 
 template <typename T>
 class Stack {
-protected:
+private:
     int _size = 0;
 public:
     Stack() = default;
@@ -22,15 +22,17 @@ public:
     }
 
     Stack& operator=(const Stack& other) {
-        if (this == &other)
+        if (this == &other) {
             return *this;
+        }
         _size = other._size;
         return *this;
     }
 
     Stack& operator=(Stack&& other) noexcept {
-        if (this == &other)
+        if (this == &other) {
             return *this;
+        }
         _size = other._size;
         other._size = 0;
         return *this;
@@ -70,7 +72,7 @@ public:
      */
     void clear() {
         T value;
-        while (pop(value));
+        while (pop(value)) {}
     }
 
     /**
@@ -115,8 +117,9 @@ public:
     }
 
     ListStack& operator=(const ListStack& other) {
-        if (this == &other)
+        if (this == &other) {
             return *this;
+        }
         Stack<T>::operator=(other);
         top = other.top;
         Node** current = &(top);
@@ -129,8 +132,9 @@ public:
     }
 
     ListStack& operator=(ListStack&& other) noexcept {
-        if (this == &other)
+        if (this == &other) {
             return *this;
+        }
         Stack<T>::operator=(std::move(other));
         top = other.top;
         other.top = nullptr;
@@ -154,8 +158,9 @@ public:
 
     bool pop(T& value) override {
         Node* top_node = top;
-        if (top_node == nullptr)
+        if (top_node == nullptr) {
             return false;
+        }
         top = top_node->next;
         value = std::move(top_node->data);
         delete top_node;
@@ -164,8 +169,9 @@ public:
     }
 
     bool peek(T& value) override {
-        if (top == nullptr)
+        if (top == nullptr) {
             return false;
+        }
         value = top->data;
         return true;
     }
@@ -191,8 +197,9 @@ public:
     }
 
     StaticStack& operator=(const StaticStack& other) {
-        if (this == &other)
+        if (this == &other) {
             return *this;
+        }
         Stack<T>::operator =(other);
         _capacity = other._capacity;
         top = other.top;
@@ -202,8 +209,9 @@ public:
     }
 
     StaticStack& operator=(StaticStack&& other) noexcept {
-        if (this == &other)
+        if (this == &other) {
             return *this;
+        }
         Stack<T>::operator =(std::move(other));
         _capacity = other._capacity;
         other._capacity = 0;
@@ -319,9 +327,10 @@ public:
             _capacity *= 2;
             _capacity = std::max(_capacity, 4);
             T* new_data = new (std::nothrow) T[_capacity];
-            if (new_data == nullptr)
+            if (new_data == nullptr) {
                 return false;
-            std::copy(data, data + this->_size, new_data);
+            }
+            std::copy(data, data + this->size(), new_data);
             free(data);
             data = new_data;
         }
@@ -349,4 +358,4 @@ public:
 };
 
 
-#endif // STACK_LIB_HPP
+#endif // STACK_HPP

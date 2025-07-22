@@ -1,0 +1,18 @@
+Checks: '
+  *,
+  -llvmlibc-restrict-system-libc-headers,
+  -llvmlibc-inline-function-decl,
+  -llvmlibc-implementation-in-namespace,
+  -modernize-use-trailing-return-type,
+  -altera-unroll-loops,
+  -readability-magic-numbers,
+  -cppcoreguidelines-avoid-magic-numbers,
+  -cppcoreguidelines-init-variables,
+  -readability-identifier-length,
+  -llvmlibc-callee-namespace,
+  -readability-function-cognitive-complexity,
+  -cppcoreguidelines-pro-bounds-pointer-arithmetic,
+  -cppcoreguidelines-no-malloc
+'
+HeaderFilterRegex: '.*'
+WarningsAsErrors: '*'
