@@ -58,5 +58,31 @@ jobs:
           toolchain: stable
           components: clippy, rustfmt
 
+      - name: Print tools versions
+        run: |
+          echo "GCC version:"
+          gcc --version
+          
+          echo "Clang version:"
+          clang --version
+          
+          echo "CMake version:"
+          cmake --version
+          
+          echo "Ninja version:"
+          ninja --version
+          
+          echo "Clang-Tidy version:"
+          clang-tidy --version
+          
+          echo "Python version:"
+          python --version
+          
+          echo "Ruff version:"
+          ruff --version
+          
+          echo "Rust version:"
+          rustc --version
+
       - name: Run tests
         run: python ./test.py
