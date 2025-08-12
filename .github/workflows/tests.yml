@@ -1,9 +1,6 @@
 name: Test and Lint
 
-on:
-  push:
-  pull_request:
-  workflow_dispatch:
+on: [push, pull_request, workflow_dispatch]
 
 env:
   CARGO_TERM_COLOR: always
@@ -17,27 +14,37 @@ jobs:
         shell: bash
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Install C/C++
+        run: |
+          sudo apt update
+          sudo apt install -y \
+            build-essential \
+            clang \
 
       - name: Install C/C++ tools
         run: |
           sudo apt update
-          sudo apt install ninja-build -y
+          sudo apt install -y \
+            cmake \
+            ninja-build \
+            clang-tidy
 
-      - name: Set up Rust
-        uses: dtolnay/rust-toolchain@master
-        with:
-          toolchain: stable
-          components: clippy, rustfmt
-
-      - name: Set up Python
+      - name: Install Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.13'
 
-      - name: Set up Ruff
+      - name: Install Python tools
         run: pip install ruff
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: stable
+          components: clippy, rustfmt
 
       - name: Run tests
         run: python ./test.py
