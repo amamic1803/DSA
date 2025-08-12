@@ -6,12 +6,13 @@
 #include <utility>
 
 
+// NOLINTBEGIN(bugprone-exception-escape)
 int main(const int argc, char *argv[]) {
     if (argc != 2) {
         return -2;
     }
 
-    int arg;
+    int arg = 0;
     try {
         arg = std::stoi(argv[1]);
     } catch (const std::invalid_argument &e) {
@@ -20,7 +21,7 @@ int main(const int argc, char *argv[]) {
         return -5;
     }
 
-    bool test_result;
+    bool test_result = false;
     switch (arg) {
         case 1:
             test_result = test_1();
@@ -52,6 +53,9 @@ int main(const int argc, char *argv[]) {
 
     return test_result ? 0 : -1;
 }
+// NOLINTEND(bugprone-exception-escape)
+
+// NOLINTBEGIN(bugprone-use-after-move,hicpp-invalid-access-moved)
 
 bool test_1() {
     // test default constructor
@@ -132,7 +136,7 @@ bool test_6() {
 
 bool test_7() {
     // test O(n) heap construction
-    const std::array<int, 7> arr {1, 2, 3, 4, 5, 6, 7};
+    constexpr std::array<int, 7> arr {1, 2, 3, 4, 5, 6, 7};
 
     BinaryHeap<int> heap(arr.data(), arr.size());
 
@@ -150,7 +154,7 @@ bool test_7() {
 
 bool test_8() {
     // more complex test
-    const std::array<int, 7> init_arr {1, 2, 3, 4, 5, 6, 7};
+    constexpr std::array<int, 7> init_arr {1, 2, 3, 4, 5, 6, 7};
     BinaryHeap<int> heap(init_arr.data(), init_arr.size());
     for (int i = heap.size() + 1; i <= 100; i++) {
         heap.insert(i);
@@ -167,3 +171,5 @@ bool test_8() {
 
     return heap.empty();
 }
+
+// NOLINTEND(bugprone-use-after-move,hicpp-invalid-access-moved)

@@ -10,24 +10,18 @@
 template <typename T>
 class BinaryHeap {
 private:
-    T *_heap = nullptr;
     int _size = 0;
     int _capacity = 0;
+    T *_heap = nullptr;
 
     /**
      * @brief Increase the capacity of the heap.
      *
-     * Always increases the capacity by adding one level to the tree which means that the new capacity is (2 * old_capacity + 1).
+     * Always increases the capacity by adding one level to the tree,
+     * which means that the new capacity is (2 * old_capacity + 1).
      */
     void increase_capacity() {
-        const int k = std::log2(_capacity + 1) + 1;  // new number of levels
-        _capacity = std::pow(2, k) - 1;  // new capacity
-        _heap = static_cast<T*>(realloc(_heap, _capacity * sizeof(T)));
-        if (_heap == nullptr) {
-            _capacity = 0;
-            _size = 0;
-            throw std::bad_alloc();
-        }
+        reserve_capacity((_capacity * 2) + 1);
     }
 
     /**
@@ -44,12 +38,10 @@ private:
         }
         const int k = static_cast<int>(std::ceil(std::log2(static_cast<double>(capacity) + 1)));  // number of levels
         _capacity = static_cast<int>(std::pow(2, k)) - 1;  // new capacity
-        _heap = static_cast<T*>(realloc(_heap, _capacity * sizeof(T)));
-        if (_heap == nullptr) {
-            _capacity = 0;
-            _size = 0;
-            throw std::bad_alloc();
-        }
+        T* new_heap = new T[_capacity];
+        std::copy(_heap, _heap + _size, new_heap);
+        delete[] _heap;
+        _heap = new_heap;
     }
 
     /**
@@ -68,8 +60,8 @@ private:
      * @param i The index (node) to start heapifying from.
      */
     void heapify(const int i) {
-        const int left = (i << 1) + 1;
-        const int right = (i << 1) + 2;
+        const int left = (i * 2) + 1;
+        const int right = (i * 2) + 2;
 
         int largest = i;
         if (left < _size && _heap[left] > _heap[largest]) {
@@ -97,8 +89,8 @@ private:
         if (item == _heap[i]) {
             return true;
         }
-        const int left = (i << 1) + 1;
-        const int right = (i << 1) + 2;
+        const int left = (i * 2) + 1;
+        const int right = (i * 2) + 2;
         return search_rec(item, left) || search_rec(item, right);
     }
 public:
@@ -110,29 +102,23 @@ public:
      * @param elements The array of elements.
      * @param n The number of elements in the array.
      */
-    BinaryHeap(const T* elements, const int n) : _size(n) {
-        reserve_capacity(_size);
+    BinaryHeap(const T* elements, const int n) {
+        reserve_capacity(n);
+        _size = n;  // NOLINT(cppcoreguidelines-prefer-member-initializer)
         std::copy(elements, elements + _size, _heap);
-        for (int i = (n >> 1) - 1; i >= 0; i--) {
+        for (int i = (n / 2) - 1; i >= 0; i--) {
             heapify(i);
         }
     }
 
     // copy constructor
-    BinaryHeap(const BinaryHeap &other) : _size(other._size), _capacity(other._capacity) {
-        _heap = static_cast<T*>(realloc(_heap, _capacity * sizeof(T)));
-        if (_heap == nullptr) {
-            _capacity = 0;
-            _size = 0;
-            throw std::bad_alloc();
-        }
+    BinaryHeap(const BinaryHeap &other) : _size(other._size), _capacity(other._capacity), _heap(new T[_capacity]) {
         std::copy(other._heap, other._heap + other._size, _heap);
     }
 
     // move constructor
     BinaryHeap(BinaryHeap &&other) noexcept : _size(other._size), _capacity(other._capacity) {
-        free(_heap);
-        _heap = other._heap;
+        _heap = other._heap; // NOLINT(cppcoreguidelines-prefer-member-initializer)
         other._heap = nullptr;
         other._size = 0;
         other._capacity = 0;
@@ -143,12 +129,8 @@ public:
         if (this != &other) {
             _size = other._size;
             _capacity = other._capacity;
-            _heap = static_cast<T*>(realloc(_heap, _capacity * sizeof(T)));
-            if (_heap == nullptr) {
-                _capacity = 0;
-                _size = 0;
-                throw std::bad_alloc();
-            }
+            delete[] _heap;
+            _heap = new T[_capacity];
             std::copy(other._heap, other._heap + other._size, _heap);
         }
         return *this;
@@ -157,7 +139,7 @@ public:
     // move assignment
     BinaryHeap &operator=(BinaryHeap &&other) noexcept {
         if (this != &other) {
-            free(_heap);
+            delete[] _heap;
             _heap = other._heap;
             _size = other._size;
             _capacity = other._capacity;
@@ -170,7 +152,7 @@ public:
 
     // destructor
     ~BinaryHeap() {
-        free(_heap);
+        delete[] _heap;
     }
 
     /**
@@ -200,9 +182,9 @@ public:
         _heap[_size] = item;
         int tmp = _size++;
         while (tmp != 0) {
-            if (_heap[tmp] > _heap[(tmp - 1) >> 1]) {
-                swap(tmp, (tmp - 1) >> 1);
-                tmp = (tmp - 1) >> 1;
+            if (_heap[tmp] > _heap[(tmp - 1) / 2]) {
+                swap(tmp, (tmp - 1) / 2);
+                tmp = (tmp - 1) / 2;
             } else {
                 break;
             }
