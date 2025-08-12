@@ -4,8 +4,8 @@
 general-purpose, and comparison-based sorting algorithm.
 Most implementations produce a stable sort, which means that the relative order
 of equal elements is the same in the input and output. Merge sort is a
-divide-and-conquer algorithm that was invented by _John von Neumann_ in 1945.
-A detailed description and analysis of bottom-up merge sort appeared in a report
+divide-and-conquer algorithm invented by _John von Neumann_ in 1945.
+A detailed description and analysis of the bottom-up merge sort appeared in a report
 by _Goldstine_ and _von Neumann_ as early as 1948.
 
 Conceptually, a _merge sort_ works as follows:

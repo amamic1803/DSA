@@ -1,70 +1,74 @@
 #include "fibonacci_sequence.hpp"
 #include "tests.hpp"
+#include <cstdint>
 #include <string>
 #include <vector>
 
+// NOLINTBEGIN(bugprone-exception-escape)
 int main(const int argc, char *argv[]) {
     if (argc != 2) {
         return -2;
     }
 
     const std::string arg(argv[1]);
-    bool test_result;
+    bool test_result = false;
 
-    if (arg == "seq1")
+    if (arg == "seq1") {
         test_result = test_seq1();
-    else if (arg == "seq2")
+    } else if (arg == "seq2") {
         test_result = test_seq2();
-    else if (arg == "seq3")
+    } else if (arg == "seq3") {
         test_result = test_seq3();
-    else if (arg == "seq4")
+    } else if (arg == "seq4") {
         test_result = test_seq4();
-    else if (arg == "seq5")
+    } else if (arg == "seq5") {
         test_result = test_seq5();
-    else if (arg == "num1")
+    } else if (arg == "num1") {
         test_result = test_num1();
-    else if (arg == "num2")
+    } else if (arg == "num2") {
         test_result = test_num2();
-    else if (arg == "num3")
+    } else if (arg == "num3") {
         test_result = test_num3();
-    else if (arg == "num4")
+    } else if (arg == "num4") {
         test_result = test_num4();
-    else if (arg == "num5")
+    } else if (arg == "num5") {
         test_result = test_num5();
-    else if (arg == "num6")
+    } else if (arg == "num6") {
         test_result = test_num6();
-    else
+    } else {
         return -3;
+    }
 
     return test_result ? 0 : -1;
 }
+// NOLINTEND(bugprone-exception-escape)
 
 bool test_seq1() {
-    const std::vector<unsigned long long> expected{0, 1, 1, 2, 3, 5, 8, 13, 21, 34};
+    const std::vector<int64_t> expected{0, 1, 1, 2, 3, 5, 8, 13, 21, 34};
     const auto result = fibonacciSequence(9);
     return result == expected;
 }
 
 bool test_seq2() {
-    const std::vector<unsigned long long> expected{0};
+    const std::vector<int64_t> expected{0};
     const auto result = fibonacciSequence(0);
     return result == expected;
 }
 
 bool test_seq3() {
-    const std::vector<unsigned long long> expected{0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377, 610, 987, 1597, 2584, 4181, 6765};
+    const std::vector<int64_t> expected{0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377, 610, 987, 1597, 2584, 4181, 6765};
     const auto result = fibonacciSequence(20);
     return result == expected;
 }
 
 bool test_seq4() {
-    const std::vector<unsigned long long> expected{0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144};
+    const std::vector<int64_t> expected{0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144};
     const auto result = fibonacciSequence(12);
     return result == expected;
 }
 
 bool test_seq5() {
-    const std::vector<unsigned long long> expected{0, 1, 1, 2};
+    const std::vector<int64_t> expected{0, 1, 1, 2};
     const auto result = fibonacciSequence(3);
     return result == expected;
 }

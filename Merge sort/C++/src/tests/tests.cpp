@@ -6,12 +6,13 @@
 #include <string>
 #include <vector>
 
+// NOLINTBEGIN(bugprone-exception-escape)
 int main(const int argc, char *argv[]) {
     if (argc != 2) {
         return -2;
     }
 
-    int problem_number;
+    int problem_number = 0;
     try {
         problem_number = std::stoi(argv[1]);
     } catch (std::invalid_argument &_) {
@@ -22,7 +23,7 @@ int main(const int argc, char *argv[]) {
         return -5;
     }
 
-    bool test_result;
+    bool test_result = false;
     switch (problem_number) {
         case 1:
             test_result = test_1();
@@ -60,6 +61,7 @@ int main(const int argc, char *argv[]) {
 
     return test_result ? 0 : -1;
 }
+// NOLINTEND(bugprone-exception-escape)
 
 bool test_1() {
     std::vector<int> arr = {};
@@ -116,7 +118,7 @@ bool test_8() {
     mergeSort(arr.data(), static_cast<int>(arr.size()));
 
     // check if the vector is sorted using std::is_sorted
-    return std::is_sorted(arr.begin(), arr.end());
+    return std::ranges::is_sorted(arr);
 }
 
 bool test_9() {
@@ -132,7 +134,7 @@ bool test_9() {
     mergeSort(arr.data(), static_cast<int>(arr.size()));
 
     // check if the vector is sorted using std::is_sorted
-    return std::is_sorted(arr.begin(), arr.end());
+    return std::ranges::is_sorted(arr);
 }
 
 bool test_10() {
@@ -148,5 +150,5 @@ bool test_10() {
     mergeSort(arr.data(), static_cast<int>(arr.size()));
 
     // check if the vector is sorted using std::is_sorted
-    return std::is_sorted(arr.begin(), arr.end());
+    return std::ranges::is_sorted(arr);
 }

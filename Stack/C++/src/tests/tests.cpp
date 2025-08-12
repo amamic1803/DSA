@@ -1,71 +1,87 @@
 #include "stack.hpp"
 #include "tests.hpp"
+#include <exception>
+#include <iostream>
 #include <string>
 #include <utility>
 
+// NOLINTBEGIN(bugprone-exception-escape)
 int main(const int argc, char *argv[]) {
-    if (argc != 2) {
-        return -2;
-    }
-    const std::string test_name(argv[1]);
+    try {
+        if (argc != 2) {
+            return -2;
+        }
+        const std::string test_name(argv[1]);
 
-    if (test_name == "ListStack1") {
-        return test_ListStack1() ? 0 : -1;
-    }
-    if (test_name == "ListStack2") {
-        return test_ListStack2() ? 0 : -1;
-    }
-    if (test_name == "ListStack3") {
-        return test_ListStack3() ? 0 : -1;
-    }
-    if (test_name == "ListStack4") {
-        return test_ListStack4() ? 0 : -1;
-    }
-    if (test_name == "ListStack5") {
-        return test_ListStack5() ? 0 : -1;
-    }
-    if (test_name == "ListStack6") {
-        return test_ListStack6() ? 0 : -1;
-    }
-    if (test_name == "StaticStack1") {
-        return test_StaticStack1() ? 0 : -1;
-    }
-    if (test_name == "StaticStack2") {
-        return test_StaticStack2() ? 0 : -1;
-    }
-    if (test_name == "StaticStack3") {
-        return test_StaticStack3() ? 0 : -1;
-    }
-    if (test_name == "StaticStack4") {
-        return test_StaticStack4() ? 0 : -1;
-    }
-    if (test_name == "StaticStack5") {
-        return test_StaticStack5() ? 0 : -1;
-    }
-    if (test_name == "StaticStack6") {
-        return test_StaticStack6() ? 0 : -1;
-    }
-    if (test_name == "DynamicStack1") {
-        return test_DynamicStack1() ? 0 : -1;
-    }
-    if (test_name == "DynamicStack2") {
-        return test_DynamicStack2() ? 0 : -1;
-    }
-    if (test_name == "DynamicStack3") {
-        return test_DynamicStack3() ? 0 : -1;
-    }
-    if (test_name == "DynamicStack4") {
-        return test_DynamicStack4() ? 0 : -1;
-    }
-    if (test_name == "DynamicStack5") {
-        return test_DynamicStack5() ? 0 : -1;
-    }
-    if (test_name == "DynamicStack6") {
-        return test_DynamicStack6() ? 0 : -1;
+        if (test_name == "ListStack1") {
+            return test_ListStack1() ? 0 : -1;
+        }
+        if (test_name == "ListStack2") {
+            return test_ListStack2() ? 0 : -1;
+        }
+        if (test_name == "ListStack3") {
+            return test_ListStack3() ? 0 : -1;
+        }
+        if (test_name == "ListStack4") {
+            return test_ListStack4() ? 0 : -1;
+        }
+        if (test_name == "ListStack5") {
+            return test_ListStack5() ? 0 : -1;
+        }
+        if (test_name == "ListStack6") {
+            return test_ListStack6() ? 0 : -1;
+        }
+        if (test_name == "StaticStack1") {
+            return test_StaticStack1() ? 0 : -1;
+        }
+        if (test_name == "StaticStack2") {
+            return test_StaticStack2() ? 0 : -1;
+        }
+        if (test_name == "StaticStack3") {
+            return test_StaticStack3() ? 0 : -1;
+        }
+        if (test_name == "StaticStack4") {
+            return test_StaticStack4() ? 0 : -1;
+        }
+        if (test_name == "StaticStack5") {
+            return test_StaticStack5() ? 0 : -1;
+        }
+        if (test_name == "StaticStack6") {
+            return test_StaticStack6() ? 0 : -1;
+        }
+        if (test_name == "DynamicStack1") {
+            return test_DynamicStack1() ? 0 : -1;
+        }
+        if (test_name == "DynamicStack2") {
+            return test_DynamicStack2() ? 0 : -1;
+        }
+        if (test_name == "DynamicStack3") {
+            return test_DynamicStack3() ? 0 : -1;
+        }
+        if (test_name == "DynamicStack4") {
+            return test_DynamicStack4() ? 0 : -1;
+        }
+        if (test_name == "DynamicStack5") {
+            return test_DynamicStack5() ? 0 : -1;
+        }
+        if (test_name == "DynamicStack6") {
+            return test_DynamicStack6() ? 0 : -1;
+        }
+    } catch (const std::exception& e) {
+        std::cerr << "Exception caught: " << e.what() << '\n';
+        return -4;
+    } catch (...) {
+        // Catch all other exceptions
+        std::cerr << "Unknown exception caught." << '\n';
+        return -5;
     }
 
     return -3;
 }
+// NOLINTEND(bugprone-exception-escape)
+
+
+// NOLINTBEGIN(bugprone-use-after-move,hicpp-invalid-access-moved,clang-analyzer-cplusplus.Move)
 
 bool test_ListStack1() {
     // test ListStack with int
@@ -89,7 +105,7 @@ bool test_ListStack1() {
         return false;
     }
 
-    int value;
+    int value = 0;
 
     if (!s.peek(value) || value != 3) {
         return false;
@@ -219,68 +235,86 @@ bool test_ListStack3() {
     Stack<int>* s = new ListStack<int>();
 
     if (!s->isEmpty()) {
+        delete s;
         return false;
     }
     if (s->size() != 0) {
+        delete s;
         return false;
     }
 
     if (!s->push(1)) {
+        delete s;
         return false;
     }
     if (!s->push(2)) {
+        delete s;
         return false;
     }
     if (!s->push(3)) {
+        delete s;
         return false;
     }
 
-    int value;
+    int value = 0;
 
     if (!s->peek(value) || value != 3) {
+        delete s;
         return false;
     }
 
     if (!s->pop(value) || value != 3) {
+        delete s;
         return false;
     }
     if (!s->pop(value) || value != 2) {
+        delete s;
         return false;
     }
     if (!s->pop(value) || value != 1) {
+        delete s;
         return false;
     }
     if (s->pop(value)) {
+        delete s;
         return false;
     }
 
     if (s->size() != 0) {
+        delete s;
         return false;
     }
     if (!s->isEmpty()) {
+        delete s;
         return false;
     }
 
     if (!s->push(1)) {
+        delete s;
         return false;
     }
     if (!s->push(2)) {
+        delete s;
         return false;
     }
     if (!s->push(3)) {
+        delete s;
         return false;
     }
 
     s->clear();
 
     if (s->size() != 0) {
+        delete s;
         return false;
     }
     if (!s->isEmpty()) {
+        delete s;
         return false;
     }
 
     if (s->pop(value)) {
+        delete s;
         return false;
     }
 
@@ -295,68 +329,86 @@ bool test_ListStack4() {
     Stack<std::string>* s = new ListStack<std::string>();
 
     if (!s->isEmpty()) {
+        delete s;
         return false;
     }
     if (s->size() != 0) {
+        delete s;
         return false;
     }
 
     if (!s->push("1")) {
+        delete s;
         return false;
     }
     if (!s->push("2")) {
+        delete s;
         return false;
     }
     if (!s->push("3")) {
+        delete s;
         return false;
     }
 
     std::string value;
 
     if (!s->peek(value) || value != "3") {
+        delete s;
         return false;
     }
 
     if (!s->pop(value) || value != "3") {
+        delete s;
         return false;
     }
     if (!s->pop(value) || value != "2") {
+        delete s;
         return false;
     }
     if (!s->pop(value) || value != "1") {
+        delete s;
         return false;
     }
     if (s->pop(value)) {
+        delete s;
         return false;
     }
 
     if (s->size() != 0) {
+        delete s;
         return false;
     }
     if (!s->isEmpty()) {
+        delete s;
         return false;
     }
 
     if (!s->push("1")) {
+        delete s;
         return false;
     }
     if (!s->push("2")) {
+        delete s;
         return false;
     }
     if (!s->push("3")) {
+        delete s;
         return false;
     }
 
     s->clear();
 
     if (s->size() != 0) {
+        delete s;
         return false;
     }
     if (!s->isEmpty()) {
+        delete s;
         return false;
     }
 
     if (s->pop(value)) {
+        delete s;
         return false;
     }
 
@@ -367,7 +419,8 @@ bool test_ListStack4() {
 
 bool test_ListStack5() {
     // test copy and move semantics
-    int value, value2;
+    int value = 0;
+    int value2 = 0;
 
     ListStack<int> s1;
     s1.push(1);
@@ -471,7 +524,8 @@ bool test_ListStack6() {
     // test copy semantics through Stack interface
     // there are no move semantics to test here
     // (move is just moving the pointer to a Stack object)
-    int value, value2;
+    int value = 0;
+    int value2 = 0;
 
     Stack<int>* s1 = new ListStack<int>();
     s1->push(1);
@@ -480,21 +534,33 @@ bool test_ListStack6() {
 
     Stack<int>* s2 = s1->clone();
     if (s1->size() != s2->size()) {
+        delete s1;
+        delete s2;
         return false;
     }
     if (s1->isEmpty() != s2->isEmpty()) {
+        delete s1;
+        delete s2;
         return false;
     }
     if (!s1->pop(value) || !s2->pop(value2)) {
+        delete s1;
+        delete s2;
         return false;
     }
     if (value != value2) {
+        delete s1;
+        delete s2;
         return false;
     }
     if (s1->size() != s2->size()) {
+        delete s1;
+        delete s2;
         return false;
     }
     if (s1->isEmpty() != s2->isEmpty()) {
+        delete s1;
+        delete s2;
         return false;
     }
 
@@ -529,7 +595,7 @@ bool test_StaticStack1() {
         return false;
     }
 
-    int value;
+    int value = 0;
 
     if (!s.peek(value) || value != 3) {
         return false;
@@ -665,74 +731,94 @@ bool test_StaticStack3() {
     Stack<int>* s = new StaticStack<int>(3);
 
     if (!s->isEmpty()) {
+        delete s;
         return false;
     }
     if (s->size() != 0) {
+        delete s;
         return false;
     }
 
     if (!s->push(1)) {
+        delete s;
         return false;
     }
     if (!s->push(2)) {
+        delete s;
         return false;
     }
     if (!s->push(3)) {
+        delete s;
         return false;
     }
     if (s->push(4)) { // should be full
+        delete s;
         return false;
     }
     if (!(dynamic_cast<StaticStack<int>*>(s))->isFull()) { // should be full
+        delete s;
         return false;
     }
 
-    int value;
+    int value = 0;
 
     if (!s->peek(value) || value != 3) {
+        delete s;
         return false;
     }
 
     if (!s->pop(value) || value != 3) {
+        delete s;
         return false;
     }
     if (!s->pop(value) || value != 2) {
+        delete s;
         return false;
     }
     if (!s->pop(value) || value != 1) {
+        delete s;
         return false;
     }
     if (s->pop(value)) { // should be empty
+        delete s;
         return false;
     }
 
     if (s->size() != 0) {
+        delete s;
         return false;
     }
     if (!s->isEmpty()) {
+        delete s;
         return false;
     }
 
     if (!s->push(1)) {
+        delete s;
         return false;
     }
     if (!s->push(2)) {
+        delete s;
         return false;
     }
     if (!s->push(3)) {
+        delete s;
         return false;
     }
 
     s->clear();
 
     if (s->size() != 0) {
+        delete s;
         return false;
     }
     if (!s->isEmpty()) {
+        delete s;
         return false;
     }
 
     if (s->pop(value)) { // should be empty
+        delete s;
         return false;
     }
 
@@ -747,74 +833,94 @@ bool test_StaticStack4() {
     Stack<std::string>* s = new StaticStack<std::string>(3);
 
     if (!s->isEmpty()) {
+        delete s;
         return false;
     }
     if (s->size() != 0) {
+        delete s;
         return false;
     }
 
     if (!s->push("1")) {
+        delete s;
         return false;
     }
     if (!s->push("2")) {
+        delete s;
         return false;
     }
     if (!s->push("3")) {
+        delete s;
         return false;
     }
     if (s->push("4")) { // should be full
+        delete s;
         return false;
     }
     if (!(dynamic_cast<StaticStack<std::string>*>(s))->isFull()) { // should be full
+        delete s;
         return false;
     }
 
     std::string value;
 
     if (!s->peek(value) || value != "3") {
+        delete s;
         return false;
     }
 
     if (!s->pop(value) || value != "3") {
+        delete s;
         return false;
     }
     if (!s->pop(value) || value != "2") {
+        delete s;
         return false;
     }
     if (!s->pop(value) || value != "1") {
+        delete s;
         return false;
     }
     if (s->pop(value)) { // should be empty
+        delete s;
         return false;
     }
 
     if (s->size() != 0) {
+        delete s;
         return false;
     }
     if (!s->isEmpty()) {
+        delete s;
         return false;
     }
 
     if (!s->push("1")) {
+        delete s;
         return false;
     }
     if (!s->push("2")) {
+        delete s;
         return false;
     }
     if (!s->push("3")) {
+        delete s;
         return false;
     }
 
     s->clear();
 
     if (s->size() != 0) {
+        delete s;
         return false;
     }
     if (!s->isEmpty()) {
+        delete s;
         return false;
     }
 
     if (s->pop(value)) { // should be empty
+        delete s;
         return false;
     }
 
@@ -825,7 +931,8 @@ bool test_StaticStack4() {
 
 bool test_StaticStack5() {
     // test copy and move semantics
-    int value, value2;
+    int value = 0;
+    int value2 = 0;
 
     StaticStack<int> s1{3};
     s1.push(1);
@@ -935,7 +1042,8 @@ bool test_StaticStack6() {
     // test copy semantics through Stack interface
     // there are no move semantics to test here
     // (move is just moving the pointer to a Stack object)
-    int value, value2;
+    int value = 0;
+    int value2 = 0;
 
     Stack<int>* s1 = new StaticStack<int>(3);
     s1->push(1);
@@ -944,21 +1052,33 @@ bool test_StaticStack6() {
 
     Stack<int>* s2 = s1->clone();
     if (s1->size() != s2->size()) {
+        delete s1;
+        delete s2;
         return false;
     }
     if (s1->isEmpty() != s2->isEmpty()) {
+        delete s1;
+        delete s2;
         return false;
     }
     if (!s1->pop(value) || !s2->pop(value2)) {
+        delete s1;
+        delete s2;
         return false;
     }
     if (value != value2) {
+        delete s1;
+        delete s2;
         return false;
     }
     if (s1->size() != s2->size()) {
+        delete s1;
+        delete s2;
         return false;
     }
     if (s1->isEmpty() != s2->isEmpty()) {
+        delete s1;
+        delete s2;
         return false;
     }
 
@@ -993,7 +1113,7 @@ bool test_DynamicStack1() {
         return false;
     }
 
-    int value;
+    int value = 0;
 
     if (!s.peek(value) || value != 4) {
         return false;
@@ -1135,77 +1255,98 @@ bool test_DynamicStack3() {
     Stack<int>* s = new DynamicStack<int>(3);
 
     if (!s->isEmpty()) {
+        delete s;
         return false;
     }
     if (s->size() != 0) {
+        delete s;
         return false;
     }
 
     if (!s->push(1)) {
+        delete s;
         return false;
     }
     if (!s->push(2)) {
+        delete s;
         return false;
     }
     if (!s->push(3)) {
+        delete s;
         return false;
     }
     if (!s->push(4)) { // should resize
+        delete s;
         return false;
     }
     if (dynamic_cast<DynamicStack<int>*>(s)->capacity() <= 3) { // capacity should have increased
+        delete s;
         return false;
     }
 
-    int value;
+    int value = 0;
 
     if (!s->peek(value) || value != 4) {
+        delete s;
         return false;
     }
 
     if (!s->pop(value) || value != 4) {
+        delete s;
         return false;
     }
     if (!s->pop(value) || value != 3) {
+        delete s;
         return false;
     }
     if (!s->pop(value) || value != 2) {
+        delete s;
         return false;
     }
     if (!s->pop(value) || value != 1) {
+        delete s;
         return false;
     }
     if (s->pop(value)) { // should be empty
+        delete s;
         return false;
     }
 
     if (s->size() != 0) {
+        delete s;
         return false;
     }
     if (!s->isEmpty()) {
+        delete s;
         return false;
     }
 
     if (!s->push(1)) {
+        delete s;
         return false;
     }
     if (!s->push(2)) {
+        delete s;
         return false;
     }
     if (!s->push(3)) {
+        delete s;
         return false;
     }
 
     s->clear();
 
     if (s->size() != 0) {
+        delete s;
         return false;
     }
     if (!s->isEmpty()) {
+        delete s;
         return false;
     }
 
     if (s->pop(value)) { // should be empty
+        delete s;
         return false;
     }
 
@@ -1220,77 +1361,98 @@ bool test_DynamicStack4() {
     Stack<std::string>* s = new DynamicStack<std::string>(3);
 
     if (!s->isEmpty()) {
+        delete s;
         return false;
     }
     if (s->size() != 0) {
+        delete s;
         return false;
     }
 
     if (!s->push("1")) {
+        delete s;
         return false;
     }
     if (!s->push("2")) {
+        delete s;
         return false;
     }
     if (!s->push("3")) {
+        delete s;
         return false;
     }
     if (!s->push("4")) { // should resize
+        delete s;
         return false;
     }
     if (dynamic_cast<DynamicStack<std::string>*>(s)->capacity() <= 3) { // capacity should have increased
+        delete s;
         return false;
     }
 
     std::string value;
 
     if (!s->peek(value) || value != "4") {
+        delete s;
         return false;
     }
 
     if (!s->pop(value) || value != "4") {
+        delete s;
         return false;
     }
     if (!s->pop(value) || value != "3") {
+        delete s;
         return false;
     }
     if (!s->pop(value) || value != "2") {
+        delete s;
         return false;
     }
     if (!s->pop(value) || value != "1") {
+        delete s;
         return false;
     }
     if (s->pop(value)) { // should be empty
+        delete s;
         return false;
     }
 
     if (s->size() != 0) {
+        delete s;
         return false;
     }
     if (!s->isEmpty()) {
+        delete s;
         return false;
     }
 
     if (!s->push("1")) {
+        delete s;
         return false;
     }
     if (!s->push("2")) {
+        delete s;
         return false;
     }
     if (!s->push("3")) {
+        delete s;
         return false;
     }
 
     s->clear();
 
     if (s->size() != 0) {
+        delete s;
         return false;
     }
     if (!s->isEmpty()) {
+        delete s;
         return false;
     }
 
     if (s->pop(value)) { // should be empty
+        delete s;
         return false;
     }
 
@@ -1301,7 +1463,8 @@ bool test_DynamicStack4() {
 
 bool test_DynamicStack5() {
     // test copy and move semantics
-    int value, value2;
+    int value = 0;
+    int value2 = 0;
 
     DynamicStack<int> s1{3};
     s1.push(1);
@@ -1408,8 +1571,8 @@ bool test_DynamicStack6() {
     // test copy semantics through Stack interface
     // there are no move semantics to test here
     // (move is just moving the pointer to a Stack object)
-    int value;
-    int value2;
+    int value = 0;
+    int value2 = 0;
 
     Stack<int>* s1 = new DynamicStack<int>(3);
     s1->push(1);
@@ -1418,21 +1581,33 @@ bool test_DynamicStack6() {
 
     Stack<int>* s2 = s1->clone();
     if (s1->size() != s2->size()) {
+        delete s1;
+        delete s2;
         return false;
     }
     if (s1->isEmpty() != s2->isEmpty()) {
+        delete s1;
+        delete s2;
         return false;
     }
     if (!s1->pop(value) || !s2->pop(value2)) {
+        delete s1;
+        delete s2;
         return false;
     }
     if (value != value2) {
+        delete s1;
+        delete s2;
         return false;
     }
     if (s1->size() != s2->size()) {
+        delete s1;
+        delete s2;
         return false;
     }
     if (s1->isEmpty() != s2->isEmpty()) {
+        delete s1;
+        delete s2;
         return false;
     }
 
@@ -1441,3 +1616,5 @@ bool test_DynamicStack6() {
 
     return true;
 }
+
+// NOLINTEND(bugprone-use-after-move,hicpp-invalid-access-moved,clang-analyzer-cplusplus.Move)

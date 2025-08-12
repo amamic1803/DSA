@@ -3,9 +3,11 @@
 
 template <typename T>
 int linear_search(const T *arr, const int size, const T& key) {
-    for (int i = 0; i < size; i++)
-        if (arr[i] == key)
+    for (int i = 0; i < size; i++) {
+        if (arr[i] == key) {
             return i;
+        }
+    }
     return -1;
 }
 

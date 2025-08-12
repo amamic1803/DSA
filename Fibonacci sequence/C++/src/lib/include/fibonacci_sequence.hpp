@@ -1,6 +1,7 @@
 #ifndef FIBONACCI_SEQUENCE_HPP
 #define FIBONACCI_SEQUENCE_HPP
 
+#include <cstdint>
 #include <vector>
 
 /**
@@ -11,7 +12,7 @@
  * \param n The number of Fibonacci sequence numbers to generate.
  * \return A vector containing the Fibonacci sequence numbers.
  */
-std::vector<unsigned long long> fibonacciSequence(unsigned int n);
+std::vector<int64_t> fibonacciSequence(int n);
 
 /**
  * \brief Calculates the n-th Fibonacci number.
@@ -21,7 +22,7 @@ std::vector<unsigned long long> fibonacciSequence(unsigned int n);
  * \param n The index of the Fibonacci number to calculate.
  * \return The n-th Fibonacci number.
  */
-unsigned long long fibonacciNumber(unsigned int n);
+int64_t fibonacciNumber(int n);
 
 /**
  * \brief Calculates the n-th Fibonacci number using recursive relation.
@@ -31,6 +32,6 @@ unsigned long long fibonacciNumber(unsigned int n);
  * \param n The index of the Fibonacci number to calculate.
  * \return The n-th Fibonacci number.
  */
-unsigned long long fibonacciNumberRecursive(unsigned int n);
+int64_t fibonacciNumberRecursive(int n);
 
 #endif // FIBONACCI_SEQUENCE_HPP

@@ -5,12 +5,13 @@
 #include <string>
 #include <vector>
 
+// NOLINTBEGIN(bugprone-exception-escape)
 int main(const int argc, char *argv[]) {
     if (argc != 2) {
         return -2;
     }
 
-    int problem_number;
+    int problem_number = 0;
     try {
         problem_number = std::stoi(argv[1]);
     } catch (std::invalid_argument &_) {
@@ -21,7 +22,7 @@ int main(const int argc, char *argv[]) {
         return -5;
     }
 
-    bool test_result;
+    bool test_result = false;
     switch (problem_number) {
         case 1:
             test_result = test_1();
@@ -44,29 +45,30 @@ int main(const int argc, char *argv[]) {
 
     return test_result ? 0 : -1;
 }
+// NOLINTEND(bugprone-exception-escape)
 
 bool test_1() {
     std::vector arr{5, 4, 3, 2, 1};
     selectionSort(arr.data(), static_cast<int>(arr.size()));
-    return std::is_sorted(arr.begin(), arr.end());
+    return std::ranges::is_sorted(arr);
 }
 bool test_2() {
     std::vector arr{1, 2, 3, 4, 5};
     selectionSort(arr.data(), static_cast<int>(arr.size()));
-    return std::is_sorted(arr.begin(), arr.end());
+    return std::ranges::is_sorted(arr);
 }
 bool test_3() {
     std::vector arr = {3, 1, 4, 1, 5, 9, 2, 6, 5, 3, 5};
     selectionSort(arr.data(), static_cast<int>(arr.size()));
-    return std::is_sorted(arr.begin(), arr.end());
+    return std::ranges::is_sorted(arr);
 }
 bool test_4() {
     std::vector arr{10, -1, 2, 5, 0};
     selectionSort(arr.data(), static_cast<int>(arr.size()));
-    return std::is_sorted(arr.begin(), arr.end());
+    return std::ranges::is_sorted(arr);
 }
 bool test_5() {
     std::vector<int> arr{};
     selectionSort(arr.data(), static_cast<int>(arr.size()));
-    return std::is_sorted(arr.begin(), arr.end());
+    return std::ranges::is_sorted(arr);
 }

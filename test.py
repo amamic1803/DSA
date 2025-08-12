@@ -18,29 +18,51 @@ def main():
             print(f"    {chr(ord('a') + j)}) {language.ljust(10)} ... ", end="")
             sys.stdout.flush()
             path = os.path.join(algorithm, language)
+
             match language:
                 case "C" | "C++":
-                    if not run_test(algorithm, language, os.path.join(algorithm, language), [
+
+                    if not run_test(algorithm, language, path, [
                         "cmake",
                         "-DCMAKE_C_COMPILER=gcc",
                         "-DCMAKE_CXX_COMPILER=g++",
                         "-DCMAKE_BUILD_TYPE=Release",
-                        "-DCMAKE_C_FLAGS='-Wall -Wextra -Wpedantic -Werror'",
-                        "-DCMAKE_CXX_FLAGS='-Wall -Wextra -Wpedantic -Werror'",
                         "-G", "Ninja",
                         "-S", ".",
-                        "-B", "build"
+                        "-B", "cmake-build-release-gcc"
                     ], verbose):
                         failed += 1
                         continue
-                    if not run_test(algorithm, language, path, ["cmake", "--build", "build"], verbose):
+                    path_build = os.path.join(path, "cmake-build-release-gcc")
+                    if not run_test(algorithm, language, path_build, ["cmake", "--build", "."], verbose):
                         failed += 1
                         continue
-                    if not run_test(algorithm, language, os.path.join(path, "build"), ["ctest"], verbose):
+                    if not run_test(algorithm, language, path_build, ["ctest"], verbose):
                         failed += 1
                         continue
+
+                    if not run_test(algorithm, language, path, [
+                        "cmake",
+                        "-DCMAKE_C_COMPILER=clang",
+                        "-DCMAKE_CXX_COMPILER=clang++",
+                        "-DCMAKE_BUILD_TYPE=Release",
+                        "-G", "Ninja",
+                        "-S", ".",
+                        "-B", "cmake-build-release-clang"
+                    ], verbose):
+                        failed += 1
+                        continue
+                    path_build = os.path.join(path, "cmake-build-release-clang")
+                    if not run_test(algorithm, language, path_build, ["cmake", "--build", "."], verbose):
+                        failed += 1
+                        continue
+                    if not run_test(algorithm, language, path_build, ["ctest"], verbose):
+                        failed += 1
+                        continue
+
                     print("OK")
                     succeeded += 1
+
                 case "Python":
                     if not run_test(algorithm, language, path, ["ruff", "check", "."], verbose):
                         failed += 1
@@ -50,21 +72,26 @@ def main():
                         continue
                     print("OK")
                     succeeded += 1
+
                 case "Rust":
-                    if not run_test(algorithm, language, path, ["cargo", "clippy", "--", "-D", "warnings"], verbose):
+                    if not run_test(algorithm, language, path, ["cargo", "clippy", "--all-features", "--", "-D", "warnings"], verbose):
                         failed += 1
                         continue
-                    if not run_test(algorithm, language, path, ["cargo", "fmt", "--all", "--", "--check"], verbose):
+                    if not run_test(algorithm, language, path, ["cargo", "fmt", "--all", "--check"], verbose):
                         failed += 1
                         continue
-                    if not run_test(algorithm, language, path, ["cargo", "build"], verbose):
+                    if not run_test(algorithm, language, path, ["cargo", "build", "--all-features"], verbose):
                         failed += 1
                         continue
-                    if not run_test(algorithm, language, path, ["cargo", "test"], verbose):
+                    if not run_test(algorithm, language, path, ["cargo", "test", "--all-features"], verbose):
+                        failed += 1
+                        continue
+                    if not run_test(algorithm, language, path, ["cargo", "doc", "--all-features"], verbose):
                         failed += 1
                         continue
                     print("OK")
                     succeeded += 1
+
                 case _:
                     failed += 1
                     print("Unsupported language!")
