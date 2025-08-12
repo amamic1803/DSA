@@ -8,7 +8,10 @@ env:
 jobs:
   test-and-lint:
     name: Test and Lint
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
     defaults:
       run:
         shell: bash
@@ -19,18 +22,27 @@ jobs:
 
       - name: Install C/C++
         run: |
-          sudo apt update
-          sudo apt install -y \
-            build-essential \
-            clang \
+          if [ "$RUNNER_OS" == "Linux" ]; then
+            sudo apt update
+            sudo apt install -y build-essential clang
+          elif [ "$RUNNER_OS" == "Windows" ]; then
+              choco install -y mingw llvm
+          else
+              echo "$RUNNER_OS not supported"
+              exit 1
+          fi
 
       - name: Install C/C++ tools
         run: |
-          sudo apt update
-          sudo apt install -y \
-            cmake \
-            ninja-build \
-            clang-tidy
+          if [ "$RUNNER_OS" == "Linux" ]; then
+            sudo apt update
+            sudo apt install -y cmake ninja-build clang-tidy
+          elif [ "$RUNNER_OS" == "Windows" ]; then
+              choco install -y cmake ninja
+          else
+              echo "$RUNNER_OS not supported"
+              exit 1
+          fi
 
       - name: Install Python
         uses: actions/setup-python@v5
