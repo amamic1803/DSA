@@ -35,7 +35,7 @@ int main(const int argc, char *argv[]) {
 
     const int problem_number = (int) val;
 
-    bool test_result = false;
+    int test_result = 0;
     switch (problem_number) {
         case 1:
             test_result = test01();
@@ -71,10 +71,10 @@ int main(const int argc, char *argv[]) {
             return -5;
     }
 
-    return (int) test_result == 1 ? 0 : -1;
+    return test_result ? 0 : -1;
 }
 
-bool test01() {
+int test01() {
     const int arr[] = {1, 2, 3, 4, 5};
     const int size = 5;
     const int target = 3;
@@ -83,7 +83,7 @@ bool test01() {
     return expected == jumpSearch(arr, size, target);
 }
 
-bool test02() {
+int test02() {
     const int arr[] = {1, 2, 3, 4, 5};
     const int size = 5;
     const int target = 1;
@@ -92,7 +92,7 @@ bool test02() {
     return expected == jumpSearch(arr, size, target);
 }
 
-bool test03() {
+int test03() {
     const int arr[] = {1, 2, 3, 4, 5};
     const int size = 5;
     const int target = 5;
@@ -101,7 +101,7 @@ bool test03() {
     return expected == jumpSearch(arr, size, target);
 }
 
-bool test04() {
+int test04() {
     const int arr[] = {1, 2, 3, 4, 5};
     const int size = 5;
     const int target = 6;
@@ -110,7 +110,7 @@ bool test04() {
     return expected == jumpSearch(arr, size, target);
 }
 
-bool test05() {
+int test05() {
     const int arr[] = {1};
     const int size = 0;  // simulate an empty array
     const int target = 1;
@@ -119,7 +119,7 @@ bool test05() {
     return expected == jumpSearch(arr, size, target);
 }
 
-bool test06() {
+int test06() {
     const int arr[] = {1};
     const int size = 1;
     const int target = 1;
@@ -128,7 +128,7 @@ bool test06() {
     return expected == jumpSearch(arr, size, target);
 }
 
-bool test07() {
+int test07() {
     const int arr[] = {1};
     const int size = 1;
     const int target = 2;
@@ -137,7 +137,7 @@ bool test07() {
     return expected == jumpSearch(arr, size, target);
 }
 
-bool test08() {
+int test08() {
     const int arr[] = {1, 2};
     const int size = 2;
     const int target = 2;
@@ -146,7 +146,7 @@ bool test08() {
     return expected == jumpSearch(arr, size, target);
 }
 
-bool test09() {
+int test09() {
     const int size = 100;
     int arr[size];
     for (int i = 0; i < size; i++) {
@@ -155,14 +155,14 @@ bool test09() {
 
     for (int i = 0; i < size; i++) {
         if (i != jumpSearch(arr, size, i)) {
-            return false;
+            return 0;
         }
     }
 
-    return true;
+    return 1;
 }
 
-bool test10() {
+int test10() {
     const int size = 1000;
     int arr[size];
     for (int i = 0; i < size; i++) {
@@ -171,9 +171,9 @@ bool test10() {
 
     for (int i = 0; i < size; i++) {
         if (i != jumpSearch(arr, size, i * 2)) {
-            return false;
+            return 0;
         }
     }
 
-    return true;
+    return 1;
 }
