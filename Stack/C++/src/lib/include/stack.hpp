@@ -128,11 +128,11 @@ public:
     // NOLINTEND(bugprone-use-after-move, hicpp-invalid-access-moved)
 
     // Copy assignment operator
-    // NOLINTBEGIN(clang-analyzer-cplusplus.NewDeleteLeaks)
     ListStack& operator=(const ListStack& other) {
         if (this == &other) {
             return *this;
         }
+        this->clear();
         Stack<T>::operator=(other);
         top = other.top;
         Node** current = &(top);
@@ -143,20 +143,18 @@ public:
         }
         return *this;
     }
-    // NOLINTEND(clang-analyzer-cplusplus.NewDeleteLeaks)
 
     // Move assignment operator
-    // NOLINTBEGIN(clang-analyzer-cplusplus.NewDeleteLeaks)
     ListStack& operator=(ListStack&& other) noexcept {
         if (this == &other) {
             return *this;
         }
+        this->clear();
         top = other.top;
         other.top = nullptr;
         Stack<T>::operator=(std::move(other));
         return *this;
     }
-    // NOLINTEND(clang-analyzer-cplusplus.NewDeleteLeaks)
 
     ~ListStack() override {
         this->ListStack<T>::clear();
@@ -224,7 +222,6 @@ public:
     }
     // NOLINTEND(bugprone-use-after-move, hicpp-invalid-access-moved)
 
-    // NOLINTBEGIN(clang-analyzer-cplusplus.NewDeleteLeaks)
     StaticStack& operator=(const StaticStack& other) {
         if (this == &other) {
             return *this;
@@ -232,13 +229,12 @@ public:
         Stack<T>::operator =(other);
         _capacity = other._capacity;
         top = other.top;
+        delete[] data;
         data = new T[_capacity];
         std::copy(other.data, other.data + this->size(), data);
         return *this;
     }
-    // NOLINTEND(clang-analyzer-cplusplus.NewDeleteLeaks)
 
-    // NOLINTBEGIN(clang-analyzer-cplusplus.NewDeleteLeaks)
     StaticStack& operator=(StaticStack&& other) noexcept {
         if (this == &other) {
             return *this;
@@ -247,12 +243,12 @@ public:
         other._capacity = 0;
         top = other.top;
         other.top = -1;
+        delete[] data;
         data = other.data;
         other.data = nullptr;
         Stack<T>::operator =(std::move(other));
         return *this;
     }
-    // NOLINTEND(clang-analyzer-cplusplus.NewDeleteLeaks)
 
     ~StaticStack() override { delete[] data; }
 
@@ -332,27 +328,26 @@ public:
     }
     // NOLINTEND(bugprone-use-after-move, hicpp-invalid-access-moved)
 
-    // NOLINTBEGIN(clang-analyzer-cplusplus.NewDeleteLeaks)
     DynamicStack& operator=(const DynamicStack& other) {
         if (this == &other) {
             return *this;
         }
         Stack<T>::operator=(other);
         _capacity = other._capacity;
+        delete[] data;
         data = new T[_capacity];
         std::copy(other.data, other.data + this->size(), data);
         top = other.top;
         return *this;
     }
-    // NOLINTEND(clang-analyzer-cplusplus.NewDeleteLeaks)
 
-    // NOLINTBEGIN(clang-analyzer-cplusplus.NewDeleteLeaks)
     DynamicStack& operator=(DynamicStack&& other) noexcept {
         if (this == &other) {
             return *this;
         }
         _capacity = other._capacity;
         other._capacity = 0;
+        delete[] data;
         data = other.data;
         other.data = nullptr;
         top = other.top;
@@ -360,7 +355,6 @@ public:
         Stack<T>::operator =(std::move(other));
         return *this;
     }
-    // NOLINTEND(clang-analyzer-cplusplus.NewDeleteLeaks)
 
     ~DynamicStack() override { delete[] data; }
 
