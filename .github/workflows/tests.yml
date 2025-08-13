@@ -10,7 +10,7 @@ jobs:
     name: Test and Lint
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest]
+        os: [ubuntu-latest, windows-2025]
     runs-on: ${{ matrix.os }}
     defaults:
       run:
@@ -62,27 +62,43 @@ jobs:
         run: |
           echo "GCC version:"
           gcc --version
+          echo
+          
+          echo "G++ version:"
+          g++ --version
+          echo
           
           echo "Clang version:"
           clang --version
+          echo
+          
+          echo "Clang++ version:"
+          clang++ --version
+          echo
           
           echo "CMake version:"
           cmake --version
+          echo
           
           echo "Ninja version:"
           ninja --version
+          echo
           
           echo "Clang-Tidy version:"
           clang-tidy --version
+          echo
           
           echo "Python version:"
           python --version
+          echo
           
           echo "Ruff version:"
           ruff --version
+          echo
           
           echo "Rust version:"
           rustc --version
+          echo
 
       - name: Run tests
         run: python ./test.py

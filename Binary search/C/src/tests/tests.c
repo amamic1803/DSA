@@ -10,7 +10,7 @@ int main(const int argc, char *argv[]) {
         return -2;
     }
 
-    char *endptr;
+    char *endptr = nullptr;
     errno = 0; // To distinguish success/failure after call
     const long val = strtol(argv[1], &endptr, 10);
 
@@ -35,7 +35,7 @@ int main(const int argc, char *argv[]) {
 
     const int problem_number = (int) val;
 
-    bool test_result;
+    bool test_result = false;
     switch (problem_number) {
         case 1:
             test_result = test1();
@@ -62,7 +62,7 @@ int main(const int argc, char *argv[]) {
             return -5;
     }
 
-    return test_result ? 0 : -1;
+    return (int) test_result == 1 ? 0 : -1;
 }
 
 bool test1() {
@@ -71,7 +71,7 @@ bool test1() {
     const int target = 3;
     const int expected = 2;
 
-    return expected == binarySearch(arr, size, target);
+    return expected == binarySearch(target, arr, size);
 }
 
 bool test2() {
@@ -80,7 +80,7 @@ bool test2() {
     const int target = 1;
     const int expected = 0;
 
-    return expected == binarySearch(arr, size, target);
+    return expected == binarySearch(target, arr, size);
 }
 
 bool test3() {
@@ -89,7 +89,7 @@ bool test3() {
     const int target = 5;
     const int expected = 4;
 
-    return expected == binarySearch(arr, size, target);
+    return expected == binarySearch(target, arr, size);
 }
 
 bool test4() {
@@ -98,7 +98,7 @@ bool test4() {
     const int target = 6;
     const int expected = -1;
 
-    return expected == binarySearch(arr, size, target);
+    return expected == binarySearch(target, arr, size);
 }
 
 bool test5() {
@@ -107,7 +107,7 @@ bool test5() {
     const int target = 1;
     const int expected = -1;
 
-    return expected == binarySearch(arr, size, target);
+    return expected == binarySearch(target, arr, size);
 }
 
 bool test6() {
@@ -116,7 +116,7 @@ bool test6() {
     const int target = 1;
     const int expected = 0;
 
-    return expected == binarySearch(arr, size, target);
+    return expected == binarySearch(target, arr, size);
 }
 
 bool test7() {
@@ -125,5 +125,5 @@ bool test7() {
     const int target = 2;
     const int expected = -1;
 
-    return expected == binarySearch(arr, size, target);
+    return expected == binarySearch(target, arr, size);
 }

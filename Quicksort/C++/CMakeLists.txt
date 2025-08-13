@@ -4,12 +4,18 @@ project(Quicksort CXX)
 
 set(CMAKE_C_STANDARD 23)
 set(CMAKE_C_STANDARD_REQUIRED ON)
+set(CMAKE_C_EXTENSIONS OFF)
+
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
-set(CMAKE_C_CLANG_TIDY clang-tidy)
-set(CMAKE_CXX_CLANG_TIDY clang-tidy)
+find_program(CLANG_TIDY_EXE NAMES clang-tidy REQUIRED)
+set(CMAKE_C_CLANG_TIDY "${CLANG_TIDY_EXE};--config-file=${CMAKE_SOURCE_DIR}/../../.clang-tidy")
+set(CMAKE_CXX_CLANG_TIDY "${CLANG_TIDY_EXE};--config-file=${CMAKE_SOURCE_DIR}/../../.clang-tidy")
+
 include(CTest)
+
 
 # Add the library
 add_library(quicksort_lib STATIC
@@ -22,6 +28,9 @@ set_target_properties(quicksort_lib PROPERTIES
         OUTPUT_NAME quicksort
         PUBLIC_HEADER src/lib/include/quicksort.hpp
 )
+target_compile_options(quicksort_lib PRIVATE
+        $<$<CXX_COMPILER_ID:GNU,Clang>:-Wall -Wextra -Wpedantic -Werror>
+)
 
 # Add the tests
 add_executable(quicksort_tests src/tests/tests.hpp src/tests/tests.cpp)
@@ -33,6 +42,10 @@ set_target_properties(quicksort_tests PROPERTIES
         OUTPUT_NAME quicksort_tests
         RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests
 )
+target_compile_options(quicksort_tests PRIVATE
+        $<$<CXX_COMPILER_ID:GNU,Clang>:-Wall -Wextra -Wpedantic -Werror>
+)
+
 add_test(NAME test_1 COMMAND quicksort_tests 1)
 add_test(NAME test_2 COMMAND quicksort_tests 2)
 add_test(NAME test_3 COMMAND quicksort_tests 3)

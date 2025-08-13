@@ -10,7 +10,7 @@ int main(const int argc, char *argv[]) {
         return -2;
     }
 
-    char *endptr;
+    char *endptr = nullptr;
     errno = 0; // To distinguish success/failure after call
     const long val = strtol(argv[1], &endptr, 10);
 
@@ -35,7 +35,7 @@ int main(const int argc, char *argv[]) {
 
     const int problem_number = (int) val;
 
-    bool test_result;
+    bool test_result = false;
     switch (problem_number) {
         case 1:
             test_result = test01();
@@ -71,7 +71,7 @@ int main(const int argc, char *argv[]) {
             return -5;
     }
 
-    return test_result ? 0 : -1;
+    return (int) test_result == 1 ? 0 : -1;
 }
 
 bool test01() {

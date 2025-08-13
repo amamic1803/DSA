@@ -3,13 +3,15 @@
 
 template <typename T>
 static void insertionSort(T* arr, const int n) {
-    if (n < 2)
+    if (n < 2) {
         return;
+    }
     for (int i = 1; i < n; i++) {
         T tmp = arr[i];
-        int j;
-        for (j = i; j >= 1 && arr[j - 1] > tmp; j--)
+        int j = i;
+        for (; j >= 1 && arr[j - 1] > tmp; j--) {
             arr[j] = arr[j - 1];
+        }
         arr[j] = tmp;
     }
 }
@@ -30,13 +32,16 @@ void quicksort(T* arr, const int n) {
     }
 
     // median-of-three
-    const int mid = n >> 1;
-    if (arr[0] > arr[mid])
+    const int mid = n / 2;
+    if (arr[0] > arr[mid]) {
         swap(&arr[0], &arr[mid]);
-    if (arr[0] > arr[n - 1])
+    }
+    if (arr[0] > arr[n - 1]) {
         swap(&arr[0], &arr[n - 1]);
-    if (arr[mid] > arr[n - 1])
+    }
+    if (arr[mid] > arr[n - 1]) {
         swap(&arr[mid], &arr[n - 1]);
+    }
 
     // place pivot at position n - 2
     swap(&arr[mid], &arr[n - 2]);
@@ -46,9 +51,11 @@ void quicksort(T* arr, const int n) {
     int i = 0;
     int j = n - 2;
     while (true) {
-        while (arr[++i] < pivot);
-        while (arr[--j] > pivot);
-        if (i >= j) break;
+        while (arr[++i] < pivot) {}
+        while (arr[--j] > pivot) {}
+        if (i >= j) {
+            break;
+        }
         swap(&arr[i], &arr[j]);
     }
 
