@@ -1,12 +1,12 @@
 #ifndef BINARY_SEARCH_TESTS_H
 #define BINARY_SEARCH_TESTS_H
 
-bool test1();
-bool test2();
-bool test3();
-bool test4();
-bool test5();
-bool test6();
-bool test7();
+int test1();
+int test2();
+int test3();
+int test4();
+int test5();
+int test6();
+int test7();
 
 #endif // BINARY_SEARCH_TESTS_H

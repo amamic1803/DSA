@@ -35,7 +35,7 @@ int main(const int argc, char *argv[]) {
 
     const int problem_number = (int) val;
 
-    bool test_result = false;
+    int test_result = 0;
     switch (problem_number) {
         case 1:
             test_result = test1();
@@ -62,10 +62,10 @@ int main(const int argc, char *argv[]) {
             return -5;
     }
 
-    return (int) test_result == 1 ? 0 : -1;
+    return test_result ? 0 : -1;
 }
 
-bool test1() {
+int test1() {
     const int arr[] = {1, 2, 3, 4, 5};
     const int size = 5;
     const int target = 3;
@@ -74,7 +74,7 @@ bool test1() {
     return expected == binarySearch(target, arr, size);
 }
 
-bool test2() {
+int test2() {
     const int arr[] = {1, 2, 3, 4, 5};
     const int size = 5;
     const int target = 1;
@@ -83,7 +83,7 @@ bool test2() {
     return expected == binarySearch(target, arr, size);
 }
 
-bool test3() {
+int test3() {
     const int arr[] = {1, 2, 3, 4, 5};
     const int size = 5;
     const int target = 5;
@@ -92,7 +92,7 @@ bool test3() {
     return expected == binarySearch(target, arr, size);
 }
 
-bool test4() {
+int test4() {
     const int arr[] = {1, 2, 3, 4, 5};
     const int size = 5;
     const int target = 6;
@@ -101,7 +101,7 @@ bool test4() {
     return expected == binarySearch(target, arr, size);
 }
 
-bool test5() {
+int test5() {
     const int arr[] = {1};
     const int size = 0;  // simulate an empty array
     const int target = 1;
@@ -110,7 +110,7 @@ bool test5() {
     return expected == binarySearch(target, arr, size);
 }
 
-bool test6() {
+int test6() {
     const int arr[] = {1};
     const int size = 1;
     const int target = 1;
@@ -119,7 +119,7 @@ bool test6() {
     return expected == binarySearch(target, arr, size);
 }
 
-bool test7() {
+int test7() {
     const int arr[] = {1};
     const int size = 1;
     const int target = 2;
