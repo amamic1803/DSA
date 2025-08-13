@@ -1,4 +1,4 @@
 [package]
 name = "chinese_remainder_theorem"
 version = "0.1.0"
-edition = "2021"
+edition = "2024"

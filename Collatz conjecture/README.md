@@ -8,5 +8,3 @@ If the previous term is odd, the next term is 3 times the previous term plus 1.
 The conjecture is that these sequences always reach 1, no matter which positive integer is chosen to start the sequence.
 
 The algorithm described here finds the number of steps required to reach 1 for a given number, and also the largest number in that sequence.
-
-[Wikipedia](https://en.wikipedia.org/wiki/Collatz_conjecture)

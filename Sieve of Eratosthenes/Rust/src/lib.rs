@@ -1,4 +1,5 @@
 /// The sieve of Eratosthenes.
+///
 /// Finds all primes less than or equal to n.
 /// Uses some clever optimizations compared to the naive
 /// implementation to reduce memory usage and improve performance.
@@ -41,16 +42,55 @@ pub fn sieve_of_eratosthenes(n: u64) -> Vec<u64> {
             }
 
             // convert sieve indices that are true to their corresponding number values and add them to results
-            results.extend(sieve.into_iter().enumerate().filter_map(|(i, prime)| {
-                if prime {
-                    Some(ind_to_val(i))
-                } else {
-                    None
-                }
-            }));
+            results.extend(
+                sieve
+                    .into_iter()
+                    .enumerate()
+                    .filter_map(|(i, prime)| if prime { Some(ind_to_val(i)) } else { None }),
+            );
 
             // return results
             results
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn primes_100() {
+        assert_eq!(sieve_of_eratosthenes(100).len(), 25);
+    }
+
+    #[test]
+    fn primes_1000() {
+        assert_eq!(sieve_of_eratosthenes(1000).len(), 168);
+    }
+
+    #[test]
+    fn primes_10000() {
+        assert_eq!(sieve_of_eratosthenes(10_000).len(), 1229);
+    }
+
+    #[test]
+    fn primes_100000() {
+        assert_eq!(sieve_of_eratosthenes(100_000).len(), 9592);
+    }
+
+    #[test]
+    fn primes_1000000() {
+        assert_eq!(sieve_of_eratosthenes(1_000_000).len(), 78498);
+    }
+
+    #[test]
+    fn primes_10000000() {
+        assert_eq!(sieve_of_eratosthenes(10_000_000).len(), 664579);
+    }
+
+    #[test]
+    fn primes_100000000() {
+        assert_eq!(sieve_of_eratosthenes(100_000_000).len(), 5761455);
     }
 }

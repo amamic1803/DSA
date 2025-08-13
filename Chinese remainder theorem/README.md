@@ -4,7 +4,7 @@ The **Chinese remainder theorem** is a theorem that describes the integer soluti
 The theorem is named after the Chinese mathematician Sun Zi, who lived around 3rd century AD.
 
 If one knows the remainders of the Euclidean division of an integer n by several integers,
-then one can determine uniquely the remainder of the division of n by the least common multiple of these integers.
+then one can uniquely determine the remainder of the division of n by the least common multiple of these integers.
 
 Example:
 ```
