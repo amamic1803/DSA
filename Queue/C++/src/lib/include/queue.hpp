@@ -24,26 +24,26 @@ public:
     /**
      * Enqueues a value into the queue.
      * @param value The value to enqueue.
-     * @return True if the value was enqueued, false otherwise.
+     * @return true if the value was enqueued, false otherwise.
      */
     virtual bool enqueue(T value) = 0;
 
     /**
      * Dequeues a value from the queue.
      * @param value The value to dequeue.
-     * @return True if the value was dequeued, false otherwise.
+     * @return true if the value was dequeued, false otherwise.
      */
     virtual bool dequeue(T& value) = 0;
 
     /**
      * Peeks at the value at the front of the queue.
      * @param value The value to peek at.
-     * @return True if the value was peeked at, false otherwise.
+     * @return true if the value was peeked at, false otherwise.
      */
     virtual bool peek(T& value) const = 0;
 
     /**
-     * Gets the size of the queue.
+     * Get the size of the queue.
      * @return The size of the queue.
      */
     [[nodiscard]] virtual int size() const = 0;
@@ -52,11 +52,14 @@ public:
 template <typename T>
 class ListQueue : public Queue<T> {
 private:
+    // NOLINTBEGIN(misc-non-private-member-variables-in-classes)
     struct Node {
         T data;
         Node* next;
         Node(T data, Node* next) : data(data), next(next) {}
     };
+    // NOLINTEND(misc-non-private-member-variables-in-classes)
+
     int _size = 0;
     Node* read;
     Node* write;
@@ -80,8 +83,14 @@ public:
         other.read = other.write = nullptr;
     }
     ListQueue& operator=(const ListQueue& other) {
-        if (this == &other)
+        if (this == &other) {
             return *this;
+        }
+        while (read != nullptr) {
+            const Node* temp = read;
+            read = read->next;
+            delete temp;
+        }
         _size = other._size;
         if (other.read == nullptr) {
             read = write = nullptr;
@@ -97,8 +106,14 @@ public:
         return *this;
     }
     ListQueue& operator=(ListQueue&& other) noexcept {
-        if (this == &other)
+        if (this == &other) {
             return *this;
+        }
+        while (read != nullptr) {
+            const Node* temp = read;
+            read = read->next;
+            delete temp;
+        }
         _size = other._size;
         read = other.read;
         write = other.write;
@@ -118,36 +133,46 @@ public:
         return new ListQueue(*this);
     }
 
+
+    // this lint results in a false positive
+    // it assumes that even if the last element is dequeued, read might not become nullptr
+    // (which would result in write not getting set to nullptr and the next enqueue call would try to access a dangling pointer), but it will
+    // NOLINTBEGIN(clang-analyzer-cplusplus.NewDelete)
     bool enqueue(T value) override {
         Node* new_node = new (std::nothrow) Node(value, nullptr);
-        if (new_node == nullptr)
+        if (new_node == nullptr) {
             return false;
+        }
         if (write == nullptr) {
             read = write = new_node;
         } else {
             write->next = new_node;
-            write = new_node;
+            write = write->next;
         }
         _size++;
         return true;
     }
 
     bool dequeue(T& value) override {
-        if (read == nullptr)
+        if (read == nullptr) {
             return false;
+        }
         Node* temp = read;
         value = std::move(temp->data);
         read = temp->next;
-        if (read == nullptr)
+        if (read == nullptr) {
             write = nullptr;
+        }
         delete temp;
         _size--;
         return true;
     }
+    // NOLINTEND(clang-analyzer-cplusplus.NewDelete)
 
     bool peek(T& value) const override {
-        if (read == nullptr)
+        if (read == nullptr) {
             return false;
+        }
         value = read->data;
         return true;
     }
@@ -169,11 +194,14 @@ public:
     }
     StaticQueue(StaticQueue&& other) noexcept : _capacity(other._capacity), _data(other._data), _write(other._write), _read(other._read) {
         other._write = other._read = 0;
-        other._data = new (std::nothrow) T[other._capacity];
+        other._capacity = 1; // Reset capacity to 1 for the moved-from object
+        other._data = nullptr;
     }
     StaticQueue& operator=(const StaticQueue& other) {
-        if (this == &other)
+        if (this == &other) {
             return *this;
+        }
+        delete[] _data; // Clean up existing data
         _capacity = other._capacity;
         _data = new T[_capacity];
         std::copy(other._data, other._data + _capacity, _data);
@@ -182,13 +210,16 @@ public:
         return *this;
     }
     StaticQueue& operator=(StaticQueue&& other) noexcept {
-        if (this == &other)
+        if (this == &other) {
             return *this;
+        }
+        delete[] _data; // Clean up existing data
         _capacity = other._capacity;
         _data = other._data;
-        other._data = new (std::nothrow) T[other._capacity];
         _write = other._write;
         _read = other._read;
+        other._capacity = 1; // Reset capacity to 1 for the moved-from object
+        other._data = nullptr;
         other._write = other._read = 0;
         return *this;
     }
@@ -210,17 +241,20 @@ public:
     }
 
     bool dequeue(T& value) override {
-        if (_read == _write)
+        if (_read == _write) {
             return false;
+        }
         value = _data[_read];
         _read = (_read + 1) % _capacity;
         return true;
     }
 
     bool peek(T& value) const override {
-        if (_read != _write)
+        if (_read != _write) {
             value = _data[_read];
-        return _read != _write;
+            return true;
+        }
+        return false;
     }
 
     [[nodiscard]] int capacity() const { return _capacity - 1; }
@@ -242,11 +276,13 @@ public:
     DynamicQueue(DynamicQueue&& other) noexcept : _capacity(other._capacity), _data(other._data), _write(other._write), _read(other._read) {
         other._write = other._read = 0;
         other._capacity = 1;
-        other._data = new (std::nothrow) T[other._capacity];
+        other._data = nullptr;
     }
     DynamicQueue& operator=(const DynamicQueue& other) {
-        if (this == &other)
+        if (this == &other) {
             return *this;
+        }
+        delete[] _data; // Clean up existing data
         _capacity = other._capacity;
         _data = new T[_capacity];
         std::copy(other._data, other._data + _capacity, _data);
@@ -255,14 +291,16 @@ public:
         return *this;
     }
     DynamicQueue& operator=(DynamicQueue&& other) noexcept {
-        if (this == &other)
+        if (this == &other) {
             return *this;
+        }
+        delete[] _data; // Clean up existing data
         _capacity = other._capacity;
         _data = other._data;
         _write = other._write;
         _read = other._read;
         other._capacity = 1;
-        other._data = new (std::nothrow) T[other._capacity];
+        other._data = nullptr;
         other._write = other._read = 0;
         return *this;
     }
@@ -278,8 +316,10 @@ public:
         if ((_write + 1) % _capacity == _read) {
             _capacity *= 2;
             T* new_data = new (std::nothrow) T[_capacity];
-            if (new_data == nullptr)
+            if (new_data == nullptr) {
+                _capacity /= 2; // Revert to original capacity if allocation fails
                 return false;
+            }
             int j = 0;
             for (int i = _read; _read != _write; i = (i + 1) % _capacity, j++) {
                 new_data[j] = _data[i];
@@ -295,17 +335,20 @@ public:
     }
 
     bool dequeue(T& value) override {
-        if (_read == _write)
+        if (_read == _write) {
             return false;
+        }
         value = _data[_read];
         _read = (_read + 1) % _capacity;
         return true;
     }
 
     bool peek(T& value) const override {
-        if (_read != _write)
+        if (_read != _write) {
             value = _data[_read];
-        return _read != _write;
+            return true;
+        }
+        return false;
     }
 
     [[nodiscard]] int capacity() const { return _capacity - 1; }

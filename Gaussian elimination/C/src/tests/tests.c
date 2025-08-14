@@ -13,7 +13,7 @@ int main(const int argc, char *argv[]) {
         return -2;
     }
 
-    char *endptr;
+    char *endptr = nullptr;
     errno = 0; // To distinguish success/failure after call
     const long val = strtol(argv[1], &endptr, 10);
 
@@ -38,7 +38,7 @@ int main(const int argc, char *argv[]) {
 
     const int problem_number = (int) val;
 
-    bool test_result;
+    int test_result = 0;
     switch (problem_number) {
         case 1:
             test_result = test1();
@@ -71,16 +71,16 @@ int main(const int argc, char *argv[]) {
     return test_result ? 0 : -1;
 }
 
-bool are_matrices_equal(const double *matrix1, const double *matrix2, const int n, const int m) {
+int are_matrices_equal(const double *matrix1, const double *matrix2, const int n, const int m) {
     for (int i = 0; i < n * m; i++) {
         if (fabs(matrix1[i] - matrix2[i]) > DOUBLE_EPSILON) {
-            return false;
+            return 0;
         }
     }
-    return true;
+    return 1;
 }
 
-bool test1() {
+int test1() {
     double matrix[3][4] = {
             {1, 3, 1, 9},
             {1, 1, -1, 1},
@@ -95,7 +95,7 @@ bool test1() {
     return are_matrices_equal(&matrix[0][0], &expected[0][0], 3, 4);
 }
 
-bool test2() {
+int test2() {
     double matrix[3][4] = {
             {1, 3, 1, 9},
             {1, 1, -1, 1},
@@ -110,7 +110,7 @@ bool test2() {
     return are_matrices_equal(&matrix[0][0], &expected[0][0], 3, 4);
 }
 
-bool test3() {
+int test3() {
     double system[3][4] = {
             {2, 1, -1, 8},
             {-3, -1, 2, -11},
@@ -119,12 +119,12 @@ bool test3() {
     double solution[3];
     double expected_solution[3] = {2, 3, -1};
     if (!linear_system_solver(&system[0][0], 3, 4, solution)) {
-        return false;
+        return 0;
     }
     return are_matrices_equal(solution, expected_solution, 1, 3);
 }
 
-bool test4() {
+int test4() {
     double matrix[3][4] = {
             {2, 1, -1, 8},
             {-3, -1, 2, -11},
@@ -139,7 +139,7 @@ bool test4() {
     return are_matrices_equal(&matrix[0][0], &expected[0][0], 3, 4);
 }
 
-bool test5() {
+int test5() {
     double matrix[3][4] = {
             {-3, -1, 2, -11},
             {0, 5.0/3.0, 2.0/3.0, 13.0/3.0},
@@ -154,7 +154,7 @@ bool test5() {
     return are_matrices_equal(&matrix[0][0], &expected[0][0], 3, 4);
 }
 
-bool test6() {
+int test6() {
     double matrix[3][6] = {
             {2, -1, 0, 1, 0, 0},
             {-1, 2, -1, 0, 1, 0},
@@ -169,7 +169,7 @@ bool test6() {
     return are_matrices_equal(&matrix[0][0], &expected[0][0], 3, 6);
 }
 
-bool test7() {
+int test7() {
     double system[4][5] = {
             {2, 1, 0, 2, 4},
             {0, 1, 0, 3, 3},
@@ -179,12 +179,12 @@ bool test7() {
     double solution[4];
     double expected_solution[4] = {1, 0, 0, 1};
     if (!linear_system_solver(&system[0][0], 4, 5, solution)) {
-        return false;
+        return 0;
     }
     return are_matrices_equal(solution, expected_solution, 1, 4);
 }
 
-bool test8() {
+int test8() {
     double matrix[3][5] = {
             {-1, 2, 6, 7, 15},
             {3, -6, 0, -3, -9},

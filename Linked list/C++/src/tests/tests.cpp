@@ -3,43 +3,50 @@
 #include <string>
 #include <utility>
 
+
+// NOLINTBEGIN(bugprone-exception-escape)
 int main(const int argc, char *argv[]) {
     if (argc != 2) {
         return -2;
     }
 
     const std::string arg(argv[1]);
-    bool test_result;
+    bool test_result = false;
 
-    if (arg == "SinglyLinkedList1")
+    if (arg == "SinglyLinkedList1") {
         test_result = test_SinglyLinkedList1();
-    else if (arg == "SinglyLinkedList2")
+    } else if (arg == "SinglyLinkedList2") {
         test_result = test_SinglyLinkedList2();
-    else if (arg == "SinglyLinkedList3")
+    } else if (arg == "SinglyLinkedList3") {
         test_result = test_SinglyLinkedList3();
-    else if (arg == "SinglyLinkedList4")
+    } else if (arg == "SinglyLinkedList4") {
         test_result = test_SinglyLinkedList4();
-    else if (arg == "SinglyLinkedList5")
+    } else if (arg == "SinglyLinkedList5") {
         test_result = test_SinglyLinkedList5();
-    else if (arg == "SinglyLinkedList6")
+    } else if (arg == "SinglyLinkedList6") {
         test_result = test_SinglyLinkedList6();
-    else if (arg == "DoublyLinkedList1")
+    } else if (arg == "DoublyLinkedList1") {
         test_result = test_DoublyLinkedList1();
-    else if (arg == "DoublyLinkedList2")
+    } else if (arg == "DoublyLinkedList2") {
         test_result = test_DoublyLinkedList2();
-    else if (arg == "DoublyLinkedList3")
+    } else if (arg == "DoublyLinkedList3") {
         test_result = test_DoublyLinkedList3();
-    else if (arg == "DoublyLinkedList4")
+    } else if (arg == "DoublyLinkedList4") {
         test_result = test_DoublyLinkedList4();
-    else if (arg == "DoublyLinkedList5")
+    } else if (arg == "DoublyLinkedList5") {
         test_result = test_DoublyLinkedList5();
-    else if (arg == "DoublyLinkedList6")
+    } else if (arg == "DoublyLinkedList6") {
         test_result = test_DoublyLinkedList6();
-    else
+    } else {
         return -3;
+    }
 
     return test_result ? 0 : -1;
 }
+// NOLINTEND(bugprone-exception-escape)
+
+
+// NOLINTBEGIN(bugprone-use-after-move,hicpp-invalid-access-moved)
 
 bool test_SinglyLinkedList1() {
     SinglyLinkedList<int> list;
@@ -142,3 +149,5 @@ bool test_DoublyLinkedList6() {
     list2 = std::move(list1);
     return list2.get(0) == 1 && list2.get(1) == 2 && list1.empty();
 }
+
+// NOLINTEND(bugprone-use-after-move,hicpp-invalid-access-moved)

@@ -5,12 +5,13 @@
 #include <utility>
 
 
+// NOLINTBEGIN(bugprone-exception-escape)
 int main(const int argc, char *argv[]) {
     if (argc != 2) {
         return -2;
     }
 
-    int arg;
+    int arg = 0;
     try {
         arg = std::stoi(argv[1]);
     } catch (const std::invalid_argument &e) {
@@ -19,7 +20,7 @@ int main(const int argc, char *argv[]) {
         return -5;
     }
 
-    bool test_result;
+    bool test_result = false;
     switch (arg) {
         case 1:
             test_result = test_1();
@@ -51,6 +52,10 @@ int main(const int argc, char *argv[]) {
 
     return test_result ? 0 : -1;
 }
+// NOLINTEND(bugprone-exception-escape)
+
+
+// NOLINTBEGIN(bugprone-use-after-move,hicpp-invalid-access-moved,clang-analyzer-cplusplus.Move)
 
 bool test_1() {
     BinarySearchTree<int> tree;
@@ -222,3 +227,5 @@ bool test_8() {
     tree.balance();
     return tree.balanced();
 }
+
+// NOLINTEND(bugprone-use-after-move,hicpp-invalid-access-moved,clang-analyzer-cplusplus.Move)

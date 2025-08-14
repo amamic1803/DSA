@@ -33,7 +33,7 @@ namespace {
         }
         return power;
     }
-}
+}  // namespace
 
 
 int searchRabinKarp(const std::string& text, const std::string& pattern) {
@@ -50,8 +50,8 @@ int searchRabinKarp(const std::string& text, const std::string& pattern) {
 
     for (size_t i = 0; i <= n - m; i++) {
         if (pattern_hash == moving_hash) {
-            size_t j;
-            for (j = 0; j < m; j++) {
+            size_t j = 0;
+            for (; j < m; j++) {
                 if (text[i + j] != pattern[j]) {
                     break;
                 }

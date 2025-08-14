@@ -6,8 +6,12 @@
 
 template <typename T>
 class LinkedList {
-protected:
+private:
     int _size = 0;
+protected:
+    void setSize(const int new_size) {
+        this->_size = new_size;
+    }
 public:
     // constructors
     LinkedList() = default;
@@ -47,8 +51,9 @@ public:
      * @brief Removes all elements from this list.
      */
     void clear() {
-        while (!empty())
+        while (!empty()) {
             pop_front();
+        }
     }
 
     /**
@@ -133,8 +138,9 @@ public:
     [[nodiscard]] int position(const T& value) const {
         int index = 0;
         for (T element : *this) {
-            if (element == value)
+            if (element == value) {
                 return index;
+            }
             index++;
         }
         return -1;
@@ -161,6 +167,7 @@ public:
 template <typename T>
 class SinglyLinkedList : public LinkedList<T> {
 private:
+    // NOLINTBEGIN(misc-non-private-member-variables-in-classes)
     struct Node {
         T data;
         Node* next = nullptr;
@@ -168,6 +175,8 @@ private:
         explicit Node(T value) : data(value) {}
         Node(T value, Node* next) : data(value), next(next) {}
     };
+    // NOLINTEND(misc-non-private-member-variables-in-classes)
+
     Node* head = nullptr;
 public:
     // constructor
@@ -175,7 +184,7 @@ public:
 
     // copy constructor
     SinglyLinkedList(const SinglyLinkedList& other) : LinkedList<T>() {
-        this->_size = other._size;
+        this->setSize(other.size());
         Node** p = &head;
         for (T value : other) {
             *p = new Node(value);
@@ -192,16 +201,16 @@ public:
                 *p = new Node(value);
                 p = &((*p)->next);
             }
-            this->_size = other._size;
+            this->setSize(other.size());
         }
         return *this;
     }
 
     // move constructor
     SinglyLinkedList(SinglyLinkedList&& other) noexcept : LinkedList<T>(), head(other.head) {
-        this->_size = other._size;
+        this->setSize(other.size());
         other.head = nullptr;
-        other._size = 0;
+        other.setSize(0);
     }
 
     // move assignment
@@ -209,9 +218,9 @@ public:
         if (this != &other) {
             this->clear();
             head = other.head;
-            this->_size = other._size;
+            this->setSize(other.size());
             other.head = nullptr;
-            other._size = 0;
+            other.setSize(0);
         }
         return *this;
     }
@@ -224,36 +233,42 @@ public:
     }
 
     [[nodiscard]] T& get(int index) const override {
-        if (index < 0 || index >= this->_size)
+        if (index < 0 || index >= this->size()) {
             throw std::out_of_range("Index out of bounds");
+        }
         Node* current = head;
-        for (int i = 0; i < index; i++)
+        for (int i = 0; i < index; i++) {
             current = current->next;
+        }
         return current->data;
     }
 
     void insert(int index, T value) override {
-        if (index < 0 || index > this->_size)
+        if (index < 0 || index > this->size()) {
             throw std::out_of_range("Index out of bounds");
+        }
         Node** p = &head;
-        for (int i = 0; i < index; i++)
+        for (int i = 0; i < index; i++) {
             p = &((*p)->next);
+        }
         Node *new_node = new Node(value, *p);
         *p = new_node;
-        this->_size++;
+        this->setSize(this->size() + 1);
     }
 
     T erase(int index) override {
-        if (index < 0 || index >= this->_size)
+        if (index < 0 || index >= this->size()) {
             throw std::out_of_range("Index out of bounds");
+        }
         Node** p = &head;
-        for (int i = 0; i < index; i++)
+        for (int i = 0; i < index; i++) {
             p = &((*p)->next);
+        }
         Node* temp = *p;
         *p = temp->next;
         T value = std::move(temp->data);
         delete temp;
-        this->_size--;
+        this->setSize(this->size() - 1);
         return value;
     }
 
@@ -264,7 +279,7 @@ public:
                 Node* temp = *p;
                 *p = temp->next;
                 delete temp;
-                this->_size--;
+                this->setSize(this->size() - 1);
                 return true;
             }
             p = &((*p)->next);
@@ -280,7 +295,7 @@ public:
                 Node* temp = *p;
                 *p = temp->next;
                 delete temp;
-                this->_size--;
+                this->setSize(this->size() - 1);
                 removed++;
             }
             p = &((*p)->next);
@@ -311,6 +326,7 @@ public:
 
 template <typename T> class DoublyLinkedList : public LinkedList<T> {
 private:
+    // NOLINTBEGIN(misc-non-private-member-variables-in-classes)
     struct Node {
         T data;
         Node* prev = nullptr;
@@ -319,6 +335,8 @@ private:
         explicit Node(T value) : data(value) {}
         Node(T value, Node* prev, Node* next) : data(value), prev(prev), next(next) {}
     };
+    // NOLINTEND(misc-non-private-member-variables-in-classes)
+
     Node* head = nullptr;
     Node* tail = nullptr;
 public:
@@ -327,7 +345,7 @@ public:
 
     // copy constructor
     DoublyLinkedList(const DoublyLinkedList& other) : LinkedList<T>() {
-        this->_size = other._size;
+        this->setSize(other.size());
         Node** p = &head;
         for (T value : other) {
             *p = new Node(value);
@@ -339,7 +357,7 @@ public:
     DoublyLinkedList& operator=(const DoublyLinkedList& other) {
         if (this != &other) {
             this->clear();
-            this->_size = other._size;
+            this->setSize(other.size());
             Node** p = &head;
             for (T value : other) {
                 *p = new Node(value);
@@ -351,9 +369,9 @@ public:
 
     // move constructor
     DoublyLinkedList(DoublyLinkedList&& other) noexcept : LinkedList<T>(), head(other.head), tail(other.tail) {
-        this->_size = other._size;
+        this->setSize(other.size());
         other.head = other.tail = nullptr;
-        other._size = 0;
+        other.setSize(0);
     }
 
     // move assignment
@@ -362,9 +380,9 @@ public:
             this->clear();
             head = other.head;
             tail = other.tail;
-            this->_size = other._size;
+            this->setSize(other.size());
             other.head = other.tail = nullptr;
-            other._size = 0;
+            other.setSize(0);
         }
         return *this;
     }
@@ -377,68 +395,77 @@ public:
     }
 
     [[nodiscard]] T& get(int index) const override {
-        if (index < 0 || index >= this->_size)
+        if (index < 0 || index >= this->size()) {
             throw std::out_of_range("Index out of bounds");
+        }
 
         // move from the head
-        if (index <= this->_size >> 1) {
+        if (index <= this->size() / 2) {
             Node* current = head;
-            for (int i = 0; i < index; i++)
+            for (int i = 0; i < index; i++) {
                 current = current->next;
+            }
             return current->data;
         }
         // move from the tail
         Node* current = tail;
-        for (int i = this->_size - 1; i > index; i--)
+        for (int i = this->size() - 1; i > index; i--) {
             current = current->prev;
+        }
         return current->data;
     }
 
     void insert(int index, T value) override {
-        if (index < 0 || index > this->_size)
+        if (index < 0 || index > this->size()) {
             throw std::out_of_range("Index out of bounds");
+        }
 
-        if (this->_size == 0) {
+        if (this->size() == 0) {
             head = tail = new Node(value);
         } else if (index == 0) {
             // insert at the beginning
             Node* new_node = new Node(value, nullptr, head);
             head->prev = new_node;
             head = new_node;
-        } else if (index == this->_size) {
+        } else if (index == this->size()) {
             // insert at the end
             Node* new_node = new Node(value, tail, nullptr);
             tail->next = new_node;
             tail = new_node;
-        } else if (index <= this->_size >> 1) {
+        } else if (index <= this->size() / 2) {
             // insert from the head
             Node* current = head;
-            for (int i = 1; i < index; i++)
+            for (int i = 1; i < index; i++) {
                 current = current->next;
+            }
             Node* new_node = new Node(value, current, current->next);
             new_node->prev->next = new_node;
-            if (new_node->next != nullptr)
+            if (new_node->next != nullptr) {
                 new_node->next->prev = new_node;
+            }
         } else {
             // insert from the tail
             Node* current = tail;
-            for (int i = this->_size - 1; i > index; i--)
+            for (int i = this->size() - 1; i > index; i--) {
                 current = current->prev;
+            }
             Node* new_node = new Node(value, current->prev, current);
             new_node->next->prev = new_node;
-            if (new_node->prev != nullptr)
+            if (new_node->prev != nullptr) {
                 new_node->prev->next = new_node;
+            }
         }
 
-        this->_size++;
+        this->setSize(this->size() + 1);
     }
 
     T erase(int index) override {
-        if (index < 0 || index >= this->_size)
+        if (index < 0 || index >= this->size()) {
             throw std::out_of_range("Index out of bounds");
+        }
 
         T value;
-        if (this->_size == 1) {
+        if (this->size() == 1) {
             value = head->data;
             delete head;
             head = tail = nullptr;
@@ -449,38 +476,42 @@ public:
             temp->next->prev = nullptr;
             head = temp->next;
             delete temp;
-        } else if (index == this->_size - 1) {
+        } else if (index == this->size() - 1) {
             // remove from the end
             Node* temp = tail;
             value = temp->data;
             temp->prev->next = nullptr;
             tail = temp->prev;
             delete temp;
-        } else if (index <= this->_size >> 1) {
+        } else if (index <= this->size() / 2) {
             // remove from the head
             Node* current = head;
-            for (int i = 0; i < index; i++)
+            for (int i = 0; i < index; i++) {
                 current = current->next;
+            }
             Node* temp = current;
             value = temp->data;
             temp->prev->next = temp->next;
-            if (temp->next != nullptr)
+            if (temp->next != nullptr) {
                 temp->next->prev = temp->prev;
+            }
             delete temp;
         } else {
             // remove from the tail
             Node* current = tail;
-            for (int i = this->_size - 1; i > index; i--)
+            for (int i = this->size() - 1; i > index; i--) {
                 current = current->prev;
+            }
             Node* temp = current;
             value = temp->data;
             temp->next->prev = temp->prev;
-            if (temp->prev != nullptr)
+            if (temp->prev != nullptr) {
                 temp->prev->next = temp->next;
+            }
             delete temp;
         }
 
-        this->_size--;
+        this->setSize(this->size() - 1);
 
         return value;
     }
@@ -490,16 +521,20 @@ public:
 
         while (current != nullptr) {
             if (current->data == value) {
-                if (current->prev != nullptr)
+                if (current->prev != nullptr) {
                     current->prev->next = current->next;
-                if (current->next != nullptr)
+                }
+                if (current->next != nullptr) {
                     current->next->prev = current->prev;
-                if (current == head)
+                }
+                if (current == head) {
                     head = current->next;
-                if (current == tail)
+                }
+                if (current == tail) {
                     tail = current->prev;
+                }
                 delete current;
-                this->_size--;
+                this->setSize(this->size() - 1);
                 return true;
             }
             current = current->next;
@@ -514,18 +549,22 @@ public:
 
         while (current != nullptr) {
             if (current->data == value) {
-                if (current->prev != nullptr)
+                if (current->prev != nullptr) {
                     current->prev->next = current->next;
-                if (current->next != nullptr)
+                }
+                if (current->next != nullptr) {
                     current->next->prev = current->prev;
-                if (current == head)
+                }
+                if (current == head) {
                     head = current->next;
-                if (current == tail)
+                }
+                if (current == tail) {
                     tail = current->prev;
+                }
                 Node* temp = current;
                 current = current->next;
                 delete temp;
-                this->_size--;
+                this->setSize(this->size() - 1);
                 removed++;
             } else {
                 current = current->next;

@@ -18,7 +18,7 @@ There are three types of elementary row operations:
 
 Using these operations, a matrix can always be transformed into
 an upper triangular matrix (possibly bordered by rows or columns of zeros),
-and in fact one that is in row echelon form.
+and in fact, one that is in row echelon form.
 Once all the leading coefficients (the leftmost nonzero entry in each row)
 are 1, and every column containing a leading coefficient has zeros elsewhere,
 the matrix is said to be in reduced row echelon form.
@@ -32,7 +32,7 @@ and the final matrix is the unique reduced row echelon form.
 
 ${\displaystyle {\begin{bmatrix}1&3&1&9\\1&1&-1&1\\3&11&5&35\end{bmatrix}}\to {\begin{bmatrix}1&3&1&9\\0&-2&-2&-8\\0&2&2&8\end{bmatrix}}\to {\begin{bmatrix}1&3&1&9\\0&-2&-2&-8\\0&0&0&0\end{bmatrix}}\to {\begin{bmatrix}1&0&-2&-3\\0&1&1&4\\0&0&0&0\end{bmatrix}}}$
 
-Using row operations to convert a matrix into reduced row echelon form is sometimes called **Gauss–Jordan elimination**.
+Using row operations to convert a matrix into a reduced row echelon form is sometimes called **Gauss–Jordan elimination**.
 In this case, the term Gaussian elimination refers to the process until it has reached its upper triangular,
 or (unreduced) row echelon form.
 For computational reasons, when solving systems of linear equations,

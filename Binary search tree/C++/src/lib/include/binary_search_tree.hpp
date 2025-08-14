@@ -8,6 +8,7 @@
 template <typename T>
 class BinarySearchTree {
 private:
+    // NOLINTBEGIN(misc-non-private-member-variables-in-classes)
     struct Node {
         T data;
         std::unique_ptr<Node> left;
@@ -16,14 +17,15 @@ private:
         explicit Node(const T &data) : data(data), left(nullptr), right(nullptr) {}
         Node(const T &data, std::unique_ptr<Node> left, std::unique_ptr<Node> right) : data(data), left(std::move(left)), right(std::move(right)) {}
     };
+    // NOLINTEND(misc-non-private-member-variables-in-classes)
 
     int _size = 0;
     std::unique_ptr<Node> _root = nullptr;
 
     /**
-     * @brief Copy a node and all its children
-     * @param node The node to copy
-     * @return The copied node
+     * @brief Copy a node and all its children.
+     * @param node The node to copy.
+     * @return The copied node.
      */
     [[nodiscard]] std::unique_ptr<Node> copy_node(const std::unique_ptr<Node> &node) const {
         if (node) {
@@ -34,10 +36,10 @@ private:
     }
 
     /**
-     * @brief Search for a value in the tree recursively
-     * @param node The node to start the search from
-     * @param value The value to search for
-     * @return True if the value is found, false otherwise
+     * @brief Search for a value in the tree recursively.
+     * @param node The node to start the search from.
+     * @param value The value to search for.
+     * @return true if the value is found, false otherwise.
      */
     [[nodiscard]] bool search(const std::unique_ptr<Node> &node, const T &value) const {
         if (node) {
@@ -53,10 +55,10 @@ private:
     }
 
     /**
-     * @brief Insert a value into the tree recursively
-     * @param node The node to start the insertion from
-     * @param item The value to insert
-     * @return True if the value is inserted, false if it is already present
+     * @brief Insert a value into the tree recursively.
+     * @param node The node to start the insertion from.
+     * @param item The value to insert.
+     * @return true if the value is inserted, false if it is already present.
      */
     bool insert(std::unique_ptr<Node> &node, const T &item) {
         if (node) {
@@ -74,10 +76,10 @@ private:
     }
 
     /**
-     * @brief Remove a value from the tree recursively
-     * @param node The node to start the removal from
-     * @param item The value to remove
-     * @return True if the value is removed, false if it is not present
+     * @brief Remove a value from the tree recursively.
+     * @param node The node to start the removal from.
+     * @param item The value to remove.
+     * @return true if the value is removed, false if it is not present.
      */
     bool remove(std::unique_ptr<Node> &node, const T &item) {
         if (node) {
@@ -111,9 +113,9 @@ private:
     }
 
     /**
-     * @brief Traverse the tree in inorder recursively
-     * @param node The node to start the traversal from
-     * @param func The function to call on each element
+     * @brief Traverse the tree in inorder recursively.
+     * @param node The node to start the traversal from.
+     * @param func The function to call on each element.
      */
     void traverseInorder(const std::unique_ptr<Node> &node, const std::function<void(const T&)> &func) const {
         if (node) {
@@ -124,9 +126,9 @@ private:
     }
 
     /**
-     * @brief Traverse the tree in preorder recursively
-     * @param node The node to start the traversal from
-     * @param func The function to call on each element
+     * @brief Traverse the tree in preorder recursively.
+     * @param node The node to start the traversal from.
+     * @param func The function to call on each element.
      */
     void traversePreorder(const std::unique_ptr<Node> &node, const std::function<void(const T&)> &func) const {
         if (node) {
@@ -137,9 +139,9 @@ private:
     }
 
     /**
-     * @brief Traverse the tree in postorder recursively
-     * @param node The node to start the traversal from
-     * @param func The function to call on each element
+     * @brief Traverse the tree in postorder recursively.
+     * @param node The node to start the traversal from.
+     * @param func The function to call on each element.
      */
     void traversePostorder(const std::unique_ptr<Node> &node, const std::function<void(const T&)> &func) const {
         if (node) {
@@ -150,12 +152,11 @@ private:
     }
 
     /**
-     * @brief Recursive helper function to balance the tree
-     * @param elements The elements to balance
-     * @param start The start index
-     * @param end The end index
-     * @param node The node to balance
-     * @return
+     * @brief Recursive helper function to balance the tree.
+     * @param elements The elements to balance.
+     * @param start The start index.
+     * @param end The end index.
+     * @param node The node to balance.
      */
     void balance(std::vector<T> &elements, const int start, const int end, std::unique_ptr<Node> &node) {
         if (start < end) {
@@ -167,25 +168,33 @@ private:
     }
 
     /**
-     * @brief Recursive helper function to check if the tree is balanced
-     * @param node The node to check
-     * @return The height of the tree (all bits but the least significant bit) and whether the tree is balanced (the least significant bit)
+     * @brief Recursive helper function to check if the tree is balanced.
+     * @param node The node to check.
+     * @return The height of the tree (all bits but the least significant bit) and whether the tree is balanced (the least significant bit).
      */
-    int balanced_height(std::unique_ptr<Node> &node) {
+    unsigned int balanced_height(std::unique_ptr<Node> &node) {
         if (node) {
-            const int left = balanced_height(node->left);
-            const int right = balanced_height(node->right);
-            const bool left_balanced = left & 1;
-            const bool right_balanced = right & 1;
-            const int left_height = left >> 1;
-            const int right_height = right >> 1;
+            const unsigned int left = balanced_height(node->left);
+            const unsigned int right = balanced_height(node->right);
+            const bool left_balanced = static_cast<bool>(left & 1U);
+            const bool right_balanced = static_cast<bool>(right & 1U);
+            const unsigned int left_height = left >> 1U;
+            const unsigned int right_height = right >> 1U;
 
-            const int height = std::max(left_height, right_height) + 1;
-            const bool balanced = left_balanced && right_balanced && std::abs(left_height - right_height) <= 1;
+            unsigned int diff = 0;
+            unsigned int height = 0;
+            if (left_height > right_height) {
+                diff = left_height - right_height;
+                height = left_height + 1;
+            } else {
+                diff = right_height - left_height;
+                height = right_height + 1;
+            }
+            const bool balanced = left_balanced && right_balanced && (diff <= 1U);
 
-            return (height << 1) | (balanced ? 1 : 0);
+            return (height << 1U) | (balanced ? 1U : 0U);
         }
-        return 1;
+        return 1U;
     }
 
 public:
@@ -197,6 +206,9 @@ public:
 
     // copy assignment
     BinarySearchTree& operator=(const BinarySearchTree& other) {
+        if (this == &other) {
+            return *this; // handle self-assignment
+        }
         _size = other._size;
         _root = copy_node(other._root);
         return *this;
@@ -221,85 +233,82 @@ public:
     ~BinarySearchTree() = default;
 
     /**
-     * @brief Get the number of elements in the tree
-     * @return The number of elements in the tree
+     * @brief Get the number of elements in the tree.
+     * @return The number of elements in the tree.
      */
     [[nodiscard]] int size() const {
         return _size;
     }
 
     /**
-     * @brief Check if the tree is empty
-     * @return
+     * @brief Check if the tree is empty.
+     * @return true if the tree is empty, false otherwise.
      */
     [[nodiscard]] bool empty() const {
         return _size == 0;
     }
 
     /**
-     * @brief Search for a value in the tree
-     * @param value The value to search for
-     * @return True if the value is found, false otherwise
+     * @brief Search for a value in the tree.
+     * @param value The value to search for.
+     * @return true if the value is found, false otherwise.
      */
     [[nodiscard]] bool search(const T &value) const {
         return search(_root, value);
     }
 
     /**
-     * @brief Insert a value into the tree
-     * @param item The value to insert
-     * @return True if the value is inserted, false if it is already present
+     * @brief Insert a value into the tree.
+     * @param item The value to insert.
+     * @return true if the value is inserted, false if it is already present.
      */
     bool insert(const T &item) {
         return insert(_root, item);
     }
 
     /**
-     * @brief Remove a value from the tree
-     * @param item The value to remove
-     * @return True if the value is removed, false if it is not present
+     * @brief Remove a value from the tree.
+     * @param item The value to remove.
+     * @return true if the value is removed, false if it is not present.
      */
     bool remove(const T &item) {
         return remove(_root, item);
     }
 
     /**
-     * @brief Traverse the tree in inorder
-     * @param func The function to call on each element
-     * @return
+     * @brief Traverse the tree in inorder.
+     * @param func The function to call on each element.
      */
     void traverseInorder(const std::function<void(const T&)> &func) const {
         traverseInorder(_root, func);
     }
 
     /**
-     * @brief Traverse the tree in preorder
-     * @param func The function to call on each element
-     * @return
+     * @brief Traverse the tree in preorder.
+     * @param func The function to call on each element.
      */
     void traversePreorder(const std::function<void(const T&)> &func) const {
         traversePreorder(_root, func);
     }
 
     /**
-     * @brief Traverse the tree in postorder
-     * @param func The function to call on each element
-     * @return
+     * @brief Traverse the tree in postorder.
+     * @param func The function to call on each element.
      */
     void traversePostorder(const std::function<void(const T&)> &func) const {
         traversePostorder(_root, func);
     }
 
     /**
-     * @brief Check if the tree is balanced
-     * @return True if the tree is balanced, false otherwise
+     * @brief Check if the tree is balanced.
+     * @return true if the tree is balanced, false otherwise.
      */
     [[nodiscard]] bool balanced() {
-        return balanced_height(_root) & 1;
+        return balanced_height(_root) & 1U;
     }
 
     /**
-     * @brief Balance the tree, expensive operation (elements are removed and tree is rebuilt).
+     * @brief Balance the tree, expensive operation (elements are removed and the tree is rebuilt).
      */
     void balance() {
         std::vector<T> elements;

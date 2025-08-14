@@ -8,7 +8,7 @@ int main(const int argc, char *argv[]) {
         return -2;
     }
 
-    int problem_number;
+    int problem_number = 0;
     try {
         problem_number = std::stoi(argv[1]);
     } catch (std::invalid_argument &_) {
@@ -19,7 +19,7 @@ int main(const int argc, char *argv[]) {
         return -5;
     }
 
-    bool test_result;
+    bool test_result = false;
     switch (problem_number) {
         case 1:
             test_result = test_1();
