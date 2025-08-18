@@ -4,20 +4,20 @@
 #include <exception>
 #include <memory>
 #include <ranges>
+#include <stdexcept>
 #include <string>
 #include <unordered_map>
-#include <unordered_set>
 #include <utility>
 #include <vector>
 
 /**
- * Base class for exceptions thrown by the graph classes
+ * Base class for exceptions thrown by the graph classes.
  */
 class GraphException : public std::exception {
 private:
     std::string _message;
 public:
-    explicit GraphException(std::string  message) : _message(std::move(message)) {}
+    explicit GraphException(std::string message) : _message(std::move(message)) {}
 
     [[nodiscard]] const char* what() const noexcept override {
         return _message.c_str();
@@ -25,7 +25,7 @@ public:
 };
 
 /**
- * Thrown when trying to access a vertex that does not exist
+ * Exception thrown when trying to access a vertex that does not exist.
  */
 class VertexNotFoundException final : public GraphException {
 public:
@@ -33,7 +33,7 @@ public:
 };
 
 /**
- * Thrown when trying to access an edge that does not exist
+ * Exception thrown when trying to access an edge that does not exist.
  */
 class EdgeNotFoundException final : public GraphException {
 public:
@@ -41,7 +41,7 @@ public:
 };
 
 /**
- * Thrown when trying to add a vertex that already exists
+ * Exception thrown when trying to add a vertex that already exists.
  */
 class VertexAlreadyExistsException final : public GraphException {
 public:
@@ -49,7 +49,7 @@ public:
 };
 
 /**
- * Thrown when trying to add an edge that already exists
+ * Exception thrown when trying to add an edge that already exists.
  */
 class EdgeAlreadyExistsException final : public GraphException {
 public:
@@ -58,8 +58,7 @@ public:
 
 
 /**
- * Directed graph implementation, base class
- * @tparam T type of the vertices
+ * The base class for directed, weighted graphs.
  */
 template <typename T>
 class Graph {
@@ -83,103 +82,138 @@ public:
     virtual ~Graph() = default;
 
     /**
-     * Get the number of vertices in the graph
-     * @return the number of vertices in the graph
+     * Get the number of vertices in the graph.
+     * @return The number of vertices in the graph.
      */
     [[nodiscard]] virtual size_t size() const = 0;
 
     /**
-     * Check if the graph is empty (no vertices)
-     * @return true if the graph is empty, false otherwise
+     * Check if the graph is empty (has no vertices).
+     * @return true if the graph is empty, false otherwise.
      */
-    [[nodiscard]] bool empty() const {
+    [[nodiscard]] virtual bool empty() const {
         return size() == 0;
     }
 
     /**
-     * Check if the vertices are adjacent in the graph
-     * If any of the vertices does not exist, throws a VertexNotFoundException
-     * @param vertex1 the first vertex
-     * @param vertex2 the second vertex
-     * @return true if the vertices are adjacent, false otherwise
+     * Check if the vertices are adjacent in the graph.
+     * @throws VertexNotFoundException If any of the vertices don't exist.
+     * @param vertex1 The first vertex.
+     * @param vertex2 The second vertex.
+     * @return true if the vertices are adjacent, false otherwise.
      */
     [[nodiscard]] virtual bool adjacent(const T& vertex1, const T& vertex2) const = 0;
 
     /**
-     * Get the neighbours of a vertex
-     * If the vertex does not exist, throws a VertexNotFoundException
-     * @param vertex the vertex to get the neighbours of
-     * @return a vector containing the neighbours of the vertex
+     * Get the neighbors of a vertex.
+     * @throws VertexNotFoundException If the vertex doesn't exist.
+     * @param vertex The vertex to get the neighbors of.
+     * @return A vector with the neighbors of the vertex.
      */
-    [[nodiscard]] virtual std::vector<T> neighbours(const T& vertex) const = 0;
+    [[nodiscard]] virtual std::vector<T> neighbors(const T& vertex) const = 0;
 
     /**
-     * Add a vertex to the graph
-     * If vertex already exists, throws a VertexAlreadyExistsException
-     * @param vertex the vertex to add
+     * Add a vertex to the graph.
+     * @throws VertexAlreadyExistsException If the vertex already exists.
+     * @param vertex The vertex to add.
      */
     virtual void add_vertex(const T& vertex) = 0;
 
     /**
-     * Remove a vertex from the graph
-     * If the vertex does not exist, throws a VertexNotFoundException
-     * @param vertex the vertex to remove
+     * Remove a vertex from the graph.
+     * @throws VertexNotFoundException If the vertex doesn't exist.
+     * @param vertex The vertex to remove.
      */
     virtual void remove_vertex(const T& vertex) = 0;
 
     /**
-     * Add an edge to the graph (with a weight of 1, if applicable).
-     * Edges are directed, so the order of the vertices matters.
-     * If any of the vertices does not exist, throws a VertexNotFoundException.
-     * If the edge already exists, throws an EdgeAlreadyExistsException.
-     * @param vertex1 the first vertex
-     * @param vertex2 the second vertex
+     * Add an edge (with a weight of 1) to the graph.
+     *
+     * The order of the vertices matters since the graph is directed.
+     * @param vertex1 The first vertex.
+     * @param vertex2 The second vertex.
+     * @throws EdgeAlreadyExistsException If the edge already exists.
+     * @throws VertexNotFoundException If any of the vertices don't exist.
      */
-     virtual void add_edge(const T& vertex1, const T& vertex2) = 0;
+    virtual void add_edge(const T& vertex1, const T& vertex2) {
+        if (this->get_edge_weight(vertex1, vertex2) != 0.0) {
+            throw EdgeAlreadyExistsException("Edge already exists");
+        }
+        this->set_edge_weight(vertex1, vertex2, 1.0);
+    }
 
     /**
-     * Remove an edge from the graph.
-     * Edges are directed, so the order of the vertices matters.
-     * If the edge does not exist, throws an EdgeNotFoundException.
-     * If any of the vertices does not exist, throws a VertexNotFoundException.
-     * @param vertex1 the first vertex
-     * @param vertex2 the second vertex
+     * Remove an edge (set its weight to 0) from the graph.
+     *
+     * The order of the vertices matters since the graph is directed.
+     * @param vertex1 The first vertex.
+     * @param vertex2 The second vertex.
+     * @throws EdgeNotFoundException If the edge does not exist.
+     * @throws VertexNotFoundException If any of the vertices don't exist.
      */
-    virtual void remove_edge(const T& vertex1, const T& vertex2) = 0;
+    virtual void remove_edge(const T& vertex1, const T& vertex2) {
+        if (this->get_edge_weight(vertex1, vertex2) == 0.0) {
+            throw EdgeNotFoundException("Edge not found");
+        }
+        this->set_edge_weight(vertex1, vertex2, 0.0);
+    }
+
+    /**
+     * Get the weight of an edge.
+     *
+     * The order of the vertices matters since the graph is directed.
+     * @param vertex1 The first vertex.
+     * @param vertex2 The second vertex.
+     * @throws VertexNotFoundException If any of the vertices don't exist.
+     * @return The weight of the edge (0 if the edge doesn't exist).
+     */
+    [[nodiscard]] virtual double get_edge_weight(const T& vertex1, const T& vertex2) const = 0;
+
+    /**
+     * Set the weight of an edge.
+     *
+     * The order of the vertices matters since the graph is directed.
+     * @param vertex1 The first vertex.
+     * @param vertex2 The second vertex.
+     * @param weight The weight of the edge (0 to remove the edge).
+     * @throws VertexNotFoundException If any of the vertices don't exist.
+     */
+    virtual void set_edge_weight(const T& vertex1, const T& vertex2, double weight) = 0;
 
     /**
      * Get the visited status of a vertex.
-     * If the vertex does not exist, throws a VertexNotFoundException.
-     * @param vertex the vertex to check
-     * @return the visited status of the vertex
+     * @param vertex The vertex to get the visited status of.
+     * @throws VertexNotFoundException If the vertex does not exist.
+     * @return The visited status of the vertex.
      */
-    [[nodiscard]] virtual bool vertex_visited(const T& vertex) const = 0;
+    [[nodiscard]] virtual bool get_vertex_visited(const T& vertex) const = 0;
 
     /**
      * Set the visited status of a vertex.
-     * If the vertex does not exist, throws a VertexNotFoundException.
-     * @param vertex the vertex to set
-     * @param visited the new visited status of the vertex
+     * @param vertex The vertex to set the visited status of.
+     * @param visited The new visited status of the vertex.
+     * @throws VertexNotFoundException If the vertex does not exist.
      */
     virtual void set_vertex_visited(const T& vertex, bool visited) = 0;
 
     /**
-     * Reset the visited status of all vertices (set to false)
+     * Reset the visited status of all vertices (to false).
      */
     virtual void reset_vertices_visited() = 0;
 };
 
 template <typename T>
-class GraphAdjacencyList final : public Graph<T> {
+class GraphAdjacencyList : public Graph<T> {
 private:
+    // NOLINTBEGIN(misc-non-private-member-variables-in-classes)
     struct Vertex {
         T _value;
-        std::unordered_set<size_t> _neighbours;
+        std::unordered_map<size_t, double> _neighbors;
         bool _visited = false;
-
-        Vertex() : _value() {}
+        Vertex() : _value(T{}) {}
         explicit Vertex(const T& value) : _value(value) {}
     };
+    // NOLINTEND(misc-non-private-member-variables-in-classes)
 
     std::unordered_map<T, size_t> _vertices2ids;
     std::unordered_map<size_t, Vertex> _vertices;
@@ -191,13 +225,14 @@ public:
     GraphAdjacencyList(const GraphAdjacencyList& other) : _vertices2ids(other._vertices2ids), _vertices(other._vertices) {}
 
     // move constructor
+    // NOLINTNEXTLINE(bugprone-exception-escape)
     GraphAdjacencyList(GraphAdjacencyList&& other) noexcept : _vertices2ids(std::move(other._vertices2ids)), _vertices(std::move(other._vertices)) {}
 
     // copy assignment
     GraphAdjacencyList& operator=(const GraphAdjacencyList& other) {
         if (this == &other) {
             return *this;
-    }
+        }
         _vertices2ids = other._vertices2ids;
         _vertices = other._vertices;
         return *this;
@@ -221,40 +256,52 @@ public:
     }
 
     [[nodiscard]] bool adjacent(const T& vertex1, const T& vertex2) const override {
-        if (!_vertices2ids.contains(vertex1) || !_vertices2ids.contains(vertex2)) {
-            throw VertexNotFoundException("Vertex not found");
+        size_t id1 = 0;
+        size_t id2 = 0;
+        try {
+            id1 = _vertices2ids.at(vertex1);
+        } catch (const std::out_of_range& _) {
+            throw VertexNotFoundException("vertex1 not found");
         }
-        const size_t id1 = _vertices2ids.at(vertex1);
-        const size_t id2 = _vertices2ids.at(vertex2);
-        return _vertices.at(id1)._neighbours.contains(id2);
+        try {
+            id2 = _vertices2ids.at(vertex2);
+        } catch (const std::out_of_range& _) {
+            throw VertexNotFoundException("vertex2 not found");
+        }
+        return _vertices.at(id1)._neighbors.contains(id2);
     }
 
-    [[nodiscard]] std::vector<T> neighbours(const T& vertex) const override {
-        if (!_vertices2ids.contains(vertex)) {
-            throw VertexNotFoundException("Vertex not found");
+    [[nodiscard]] std::vector<T> neighbors(const T& vertex) const override {
+        size_t id = 0;
+        try {
+            id = _vertices2ids.at(vertex);
+        } catch (const std::out_of_range& _) {
+            throw VertexNotFoundException("vertex not found");
         }
-        std::vector<T> neighboursVec;
-        const size_t id = _vertices2ids.at(vertex);
-        for (const size_t neighbourId : _vertices.at(id)._neighbours) {
-            neighboursVec.push_back(_vertices.at(neighbourId)._value);
+        std::vector<T> neighborsVec;
+        for (const std::pair<const size_t, double>& neighbor : _vertices.at(id)._neighbors) {
+            neighborsVec.push_back(_vertices.at(neighbor.first)._value);
         }
-        return neighboursVec;
+        return neighborsVec;
     }
 
     void add_vertex(const T& vertex) override {
         if (_vertices2ids.contains(vertex)) {
-            throw VertexAlreadyExistsException("Vertex already exists");
+            throw VertexAlreadyExistsException("vertex already exists");
         }
-        const size_t newId = _vertices.size();
+        const size_t newId = size();
         _vertices2ids[vertex] = newId;
         _vertices[newId] = Vertex{vertex};
     }
 
     void remove_vertex(const T& vertex) override {
-        if (!_vertices2ids.contains(vertex)) {
-            throw VertexNotFoundException("Vertex not found");
+        size_t id = 0;
+        try {
+            id = _vertices2ids.at(vertex);
+        } catch (const std::out_of_range& _) {
+            throw VertexNotFoundException("vertex not found");
         }
-        const size_t id = _vertices2ids.at(vertex);
+        const size_t oldSize = size();
         _vertices2ids.erase(vertex);
         _vertices.erase(id);
 
@@ -266,55 +313,85 @@ public:
         }
 
         // update ids in _vertices
-        std::unordered_map<size_t, Vertex> newVertices;
-        newVertices.reserve(_vertices.size());
-        for (std::pair<const size_t, Vertex>& vertexGraph : _vertices) {
-            newVertices[vertexGraph.first < id ? vertexGraph.first : vertexGraph.first - 1] = std::move(vertexGraph.second);
+        for (size_t i = id + 1; i < oldSize; ++i) {
+            auto node = _vertices.extract(i);
+            node.key() = i - 1;
+            _vertices.insert(std::move(node));
         }
-        _vertices = std::move(newVertices);
 
-        // update ids in neighbours lists
+        // update ids in neighbors lists
         for (std::pair<const size_t, Vertex>& vertexGraph : _vertices) {
-            vertexGraph.second._neighbours.erase(id);
-            std::unordered_set<size_t> newNeighbours;
-            newNeighbours.reserve(vertexGraph.second._neighbours.size());
-            for (const size_t& neighbourId : vertexGraph.second._neighbours) {
-                newNeighbours.insert(neighbourId < id ? neighbourId : neighbourId - 1);
+            vertexGraph.second._neighbors.erase(id);
+            std::unordered_map<size_t, double> newNeighbors;
+            while (!vertexGraph.second._neighbors.empty()) {
+                auto node = vertexGraph.second._neighbors.extract(vertexGraph.second._neighbors.begin());
+                if (node.key() > id) {
+                    node.key() -= 1; // decrement id for neighbors with id greater than removed vertex
+                }
+                newNeighbors.insert(std::move(node));
             }
-            vertexGraph.second._neighbours = std::move(newNeighbours);
+            vertexGraph.second._neighbors = std::move(newNeighbors);
         }
     }
 
-    void add_edge(const T& vertex1, const T& vertex2) override {
-        if (adjacent(vertex1, vertex2)) {
-            throw EdgeAlreadyExistsException("Edge already exists");
+    [[nodiscard]] double get_edge_weight(const T& vertex1, const T& vertex2) const override {
+        size_t id1 = 0;
+        size_t id2 = 0;
+        try {
+            id1 = _vertices2ids.at(vertex1);
+        } catch (const std::out_of_range& _) {
+            throw VertexNotFoundException("vertex1 not found");
         }
-        const size_t id1 = _vertices2ids.at(vertex1);
-        const size_t id2 = _vertices2ids.at(vertex2);
-        _vertices.at(id1)._neighbours.insert(id2);
+        try {
+            id2 = _vertices2ids.at(vertex2);
+        } catch (const std::out_of_range& _) {
+            throw VertexNotFoundException("vertex2 not found");
+        }
+
+        double weight = 0.0;
+        try {
+            weight = _vertices.at(id1)._neighbors.at(id2);
+        } catch (const std::out_of_range& _) {}
+
+        return weight;
     }
 
-    void remove_edge(const T& vertex1, const T& vertex2) override {
-        if (!adjacent(vertex1, vertex2)) {
-            throw EdgeNotFoundException("Edge not found");
+    void set_edge_weight(const T& vertex1, const T& vertex2, double weight) override {
+        size_t id1 = 0;
+        size_t id2 = 0;
+        try {
+            id1 = _vertices2ids.at(vertex1);
+        } catch (const std::out_of_range& _) {
+            throw VertexNotFoundException("vertex1 not found");
         }
-        const size_t id1 = _vertices2ids.at(vertex1);
-        const size_t id2 = _vertices2ids.at(vertex2);
-        _vertices.at(id1)._neighbours.erase(id2);
+        try {
+            id2 = _vertices2ids.at(vertex2);
+        } catch (const std::out_of_range& _) {
+            throw VertexNotFoundException("vertex2 not found");
+        }
+
+        if (weight == 0.0) {
+            _vertices.at(id1)._neighbors.erase(id2);
+        } else {
+            _vertices.at(id1)._neighbors[id2] = weight;
+        }
     }
 
-    [[nodiscard]] bool vertex_visited(const T& vertex) const override {
-        if (!_vertices2ids.contains(vertex)) {
-            throw VertexNotFoundException("Vertex not found");
+    [[nodiscard]] bool get_vertex_visited(const T& vertex) const override {
+        try {
+            const size_t id = _vertices2ids.at(vertex);
+            return _vertices.at(id)._visited;
+        } catch (const std::out_of_range& _) {
+            throw VertexNotFoundException("vertex not found");
         }
-        return _vertices.at(_vertices2ids.at(vertex))._visited;
     }
 
     void set_vertex_visited(const T& vertex, bool visited) override {
-        if (!_vertices2ids.contains(vertex)) {
-            throw VertexNotFoundException("Vertex not found");
+        try {
+            _vertices.at(_vertices2ids.at(vertex))._visited = visited;
+        } catch (const std::out_of_range& _) {
+            throw VertexNotFoundException("vertex not found");
         }
-        _vertices.at(_vertices2ids.at(vertex))._visited = visited;
     }
 
     void reset_vertices_visited() override {
@@ -325,87 +402,88 @@ public:
 };
 
 template <typename T>
-class GraphAdjacencyMatrix final : public Graph<T> {
+class GraphAdjacencyMatrix : public Graph<T> {
 private:
+    // NOLINTBEGIN(misc-non-private-member-variables-in-classes)
     struct Vertex {
         T _value;
         bool _visited = false;
-
-        Vertex() : _value() {}
+        Vertex() : _value(T{}) {}
         explicit Vertex(const T& value) : _value(value) {}
     };
+    // NOLINTEND(misc-non-private-member-variables-in-classes)
 
     std::unordered_map<T, size_t> _vertices2ids;
     std::unordered_map<size_t, Vertex> _vertices;
-    double* _adj_matrix = nullptr;
+    std::unique_ptr<double[]> _adj_matrix;
 public:
     // constructor
     GraphAdjacencyMatrix() = default;
 
     // copy constructor
-    GraphAdjacencyMatrix(const GraphAdjacencyMatrix& other) : _vertices2ids(other._vertices2ids), _vertices(other._vertices), _adj_matrix(static_cast<double*>(malloc(other.size() * other.size() * sizeof(double)))) {
-        if (_adj_matrix == nullptr) {
-            throw std::bad_alloc();
-        }
-        std::copy(other._adj_matrix, other._adj_matrix + other.size() * other.size(), _adj_matrix);
+    GraphAdjacencyMatrix(const GraphAdjacencyMatrix& other) : _vertices2ids(other._vertices2ids), _vertices(other._vertices), _adj_matrix(std::make_unique<double[]>(other.size() * other.size())) {
+        std::copy(other._adj_matrix.get(), other._adj_matrix.get() + other.size() * other.size(), _adj_matrix.get());
     }
 
     // move constructor
-    GraphAdjacencyMatrix(GraphAdjacencyMatrix&& other) noexcept : _vertices2ids(std::move(other._vertices2ids)), _vertices(std::move(other._vertices)), _adj_matrix(other._adj_matrix) {
-        other._adj_matrix = nullptr;
-    }
+    // NOLINTNEXTLINE(bugprone-exception-escape)
+    GraphAdjacencyMatrix(GraphAdjacencyMatrix&& other) noexcept : _vertices2ids(std::move(other._vertices2ids)), _vertices(std::move(other._vertices)), _adj_matrix(std::move(other._adj_matrix)) {}
 
     // copy assignment
     GraphAdjacencyMatrix& operator=(const GraphAdjacencyMatrix& other) {
-        if (this == &other)
+        if (this == &other) {
             return *this;
+        }
         _vertices2ids = other._vertices2ids;
         _vertices = other._vertices;
-        free(_adj_matrix);
-        _adj_matrix = static_cast<double*>(malloc(other.size() * other.size() * sizeof(double)));
-        if (_adj_matrix == nullptr) {
-            throw std::bad_alloc();
-        }
-        std::copy(other._adj_matrix, other._adj_matrix + other.size() * other.size(), _adj_matrix);
+        _adj_matrix = std::make_unique<double[]>(other.size() * other.size());
+        std::copy(other._adj_matrix.get(), other._adj_matrix.get() + other.size() * other.size(), _adj_matrix.get());
         return *this;
     }
 
     // move assignment
     GraphAdjacencyMatrix& operator=(GraphAdjacencyMatrix&& other) noexcept {
-        if (this == &other)
+        if (this == &other) {
             return *this;
+        }
         _vertices2ids = std::move(other._vertices2ids);
         _vertices = std::move(other._vertices);
-        free(_adj_matrix);
-        _adj_matrix = other._adj_matrix;
-        other._adj_matrix = nullptr;
+        _adj_matrix = std::move(other._adj_matrix);
         return *this;
     }
 
     // destructor
-    ~GraphAdjacencyMatrix() override {
-        free(_adj_matrix);
-    }
+    ~GraphAdjacencyMatrix() override = default;
 
     [[nodiscard]] size_t size() const override {
         return _vertices.size();
     }
 
     [[nodiscard]] bool adjacent(const T& vertex1, const T& vertex2) const override {
-        if (!_vertices2ids.contains(vertex1) || !_vertices2ids.contains(vertex2)) {
-            throw VertexNotFoundException("Vertex not found");
+        size_t id1 = 0;
+        size_t id2 = 0;
+        try {
+            id1 = _vertices2ids.at(vertex1);
+        } catch (const std::out_of_range& _) {
+            throw VertexNotFoundException("vertex1 not found");
         }
-        const size_t id1 = _vertices2ids.at(vertex1);
-        const size_t id2 = _vertices2ids.at(vertex2);
+        try {
+            id2 = _vertices2ids.at(vertex2);
+        } catch (const std::out_of_range& _) {
+            throw VertexNotFoundException("vertex2 not found");
+        }
         return _adj_matrix[id1 * size() + id2] != 0;
     }
 
-    [[nodiscard]] std::vector<T> neighbours(const T& vertex) const override {
-        if (!_vertices2ids.contains(vertex)) {
-            throw VertexNotFoundException("Vertex not found");
+    [[nodiscard]] std::vector<T> neighbors(const T& vertex) const override {
+        size_t id = 0;
+        try {
+            id = _vertices2ids.at(vertex);
+        } catch (const std::out_of_range& _) {
+            throw VertexNotFoundException("vertex not found");
         }
+
         std::vector<T> neighboursVec;
-        const size_t id = _vertices2ids.at(vertex);
         for (size_t i = id * size(); i < (id + 1) * size(); ++i) {
             if (_adj_matrix[i] != 0) {
                 neighboursVec.push_back(_vertices.at(i % size())._value);
@@ -416,36 +494,29 @@ public:
 
     void add_vertex(const T& vertex) override {
         if (_vertices2ids.contains(vertex)) {
-            throw VertexAlreadyExistsException("Vertex already exists");
+            throw VertexAlreadyExistsException("vertex already exists");
         }
         const size_t oldSize = size();
         _vertices2ids[vertex] = oldSize;
         _vertices[oldSize] = Vertex{vertex};
-        _adj_matrix = static_cast<double*>(realloc(_adj_matrix, size() * size() * sizeof(double)));
-        if (_adj_matrix == nullptr) {
-            throw std::bad_alloc();
+
+        auto newAdjMatrix = std::make_unique<double[]>(size() * size());
+        for (size_t i = 0; i < oldSize; i++) {
+            std::move(_adj_matrix.get() + i * oldSize, _adj_matrix.get() + (i + 1) * oldSize, newAdjMatrix.get() + i * size());
+            newAdjMatrix[(i + 1) * size() - 1] = 0.0;
         }
-        // move old data to new positions
-        for (size_t i = size() - 2; i != static_cast<size_t>(-1); --i) {
-            for (size_t j = size() - 2; j != static_cast<size_t>(-1); --j) {
-                _adj_matrix[i * size() + j] = _adj_matrix[i * oldSize + j];
-            }
-        }
-        // set new row and column to 0
-        for (size_t i = 0; i < size(); i++) {
-            _adj_matrix[i * size() + size() - 1] = 0;
-        }
-        for (size_t j = 0; j < size(); j++) {
-            _adj_matrix[(size() - 1) * size() + j] = 0;
-        }
+        std::fill(newAdjMatrix.get() + (size() - 1) * size(), newAdjMatrix.get() + size() * size(), 0.0);
+        _adj_matrix = std::move(newAdjMatrix);
     }
 
     void remove_vertex(const T& vertex) override {
-        if (!_vertices2ids.contains(vertex)) {
-            throw VertexNotFoundException("Vertex not found");
+        size_t id = 0;
+        try {
+            id = _vertices2ids.at(vertex);
+        } catch (const std::out_of_range& _) {
+            throw VertexNotFoundException("vertex not found");
         }
         const size_t oldSize = size();
-        const size_t id = _vertices2ids.at(vertex);
         _vertices2ids.erase(vertex);
         _vertices.erase(id);
 
@@ -457,65 +528,72 @@ public:
         }
 
         // update ids in _vertices
-        std::unordered_map<size_t, Vertex> newVertices;
-        newVertices.reserve(_vertices.size());
-        for (std::pair<const size_t, Vertex>& vertexGraph : _vertices) {
-            newVertices[vertexGraph.first < id ? vertexGraph.first : vertexGraph.first - 1] = std::move(vertexGraph.second);
+        for (size_t i = id + 1; i < oldSize; ++i) {
+            auto node = _vertices.extract(i);
+            node.key() = i - 1;
+            _vertices.insert(std::move(node));
         }
-        _vertices = std::move(newVertices);
 
         // update adjacency matrix (remove row and column for the removed vertex)
-        double* _adj_matrix_ptr = _adj_matrix;
-        for (size_t i = 0; i < oldSize; i++) {
-            if (i == id) {
-                continue;
-            }
-            for (size_t j = 0; j < oldSize; j++) {
-                if (j == id) {
-                    continue;
-                }
-                *(_adj_matrix_ptr++) = _adj_matrix[i * oldSize + j];
+        auto newAdjMatrix = std::make_unique<double[]>(size() * size());
+        for (size_t i = 0, j = 0; i < oldSize; i++) {
+            if (i != id) {
+                std::move(_adj_matrix.get() + i * oldSize, _adj_matrix.get() + i * oldSize + id, &newAdjMatrix[j]);
+                j += id;
+                std::move(_adj_matrix.get() + i * oldSize + id + 1, _adj_matrix.get() + (i + 1) * oldSize, &newAdjMatrix[j]);
+                j += oldSize - id - 1;
             }
         }
-        const size_t newMatSize = size() * size() * sizeof(double);
-        if (newMatSize != 0) {
-            _adj_matrix = static_cast<double*>(realloc(_adj_matrix, newMatSize));
-            if (_adj_matrix == nullptr) {
-                throw std::bad_alloc();
-            }
-        } else {
-            free(_adj_matrix);
-            _adj_matrix = nullptr;
-        }
+        _adj_matrix = std::move(newAdjMatrix);
     }
 
-    void add_edge(const T& vertex1, const T& vertex2) override {
-        if (adjacent(vertex1, vertex2)) {
-            throw EdgeAlreadyExistsException("Edge already exists");
+    [[nodiscard]] double get_edge_weight(const T& vertex1, const T& vertex2) const override {
+        size_t id1 = 0;
+        size_t id2 = 0;
+        try {
+            id1 = _vertices2ids.at(vertex1);
+        } catch (const std::out_of_range& _) {
+            throw VertexNotFoundException("vertex1 not found");
         }
-        set_edge_value(vertex1, vertex2, 1);
+        try {
+            id2 = _vertices2ids.at(vertex2);
+        } catch (const std::out_of_range& _) {
+            throw VertexNotFoundException("vertex2 not found");
+        }
+        return _adj_matrix[id1 * size() + id2];
     }
 
-    void remove_edge(const T& vertex1, const T& vertex2) override {
-        if (!adjacent(vertex1, vertex2)) {
-            throw EdgeNotFoundException("Edge not found");
+    void set_edge_weight(const T& vertex1, const T& vertex2, const double weight) override {
+        size_t id1 = 0;
+        size_t id2 = 0;
+        try {
+            id1 = _vertices2ids.at(vertex1);
+        } catch (const std::out_of_range& _) {
+            throw VertexNotFoundException("vertex1 not found");
         }
-        set_edge_value(vertex1, vertex2, 0);
+        try {
+            id2 = _vertices2ids.at(vertex2);
+        } catch (const std::out_of_range& _) {
+            throw VertexNotFoundException("vertex2 not found");
+        }
+        _adj_matrix[id1 * size() + id2] = weight;
     }
 
-    [[nodiscard]] bool vertex_visited(const T& vertex) const override {
-        if (!_vertices2ids.contains(vertex)) {
-            throw VertexNotFoundException("Vertex not found");
+    [[nodiscard]] bool get_vertex_visited(const T& vertex) const override {
+        try {
+            const size_t id = _vertices2ids.at(vertex);
+            return _vertices.at(id)._visited;
+        } catch (const std::out_of_range& _) {
+            throw VertexNotFoundException("vertex not found");
         }
-        const size_t id = _vertices2ids.at(vertex);
-        return _vertices.at(id)._visited;
     }
 
     void set_vertex_visited(const T& vertex, bool visited) override {
-        if (!_vertices2ids.contains(vertex)) {
-            throw VertexNotFoundException("Vertex not found");
+        try {
+            _vertices.at(_vertices2ids.at(vertex))._visited = visited;
+        } catch (const std::out_of_range& _) {
+            throw VertexNotFoundException("vertex not found");
         }
-        _vertices.at(_vertices2ids.at(vertex))._visited = visited;
     }
 
     void reset_vertices_visited() override {
@@ -523,74 +601,38 @@ public:
             vertex.second._visited = false;
         }
     }
-
-    /**
-     * Get the value of an edge
-     * If weight is 0, the edge does not exist
-     * If any of the vertices does not exist, throws a VertexNotFoundException
-     * @param vertex1 the first vertex
-     * @param vertex2 the second vertex
-     * @return the weight of the edge (0 means no edge, 1 if not weighted)
-     */
-    [[nodiscard]] double get_edge_value(const T& vertex1, const T& vertex2) const {
-        if (!_vertices2ids.contains(vertex1) || !_vertices2ids.contains(vertex2)) {
-            throw VertexNotFoundException("Vertex not found");
-        }
-        const size_t id1 = _vertices2ids.at(vertex1);
-        const size_t id2 = _vertices2ids.at(vertex2);
-        return _adj_matrix[id1 * size() + id2];
-    }
-
-    /**
-     * Set the value of an edge
-     * If weight is 0, the edge is removed
-     * If any of the vertices does not exist, throws a VertexNotFoundException
-     * @param vertex1 the first vertex
-     * @param vertex2 the second vertex
-     * @param weight the weight of the edge (0 means no edge)
-     */
-    void set_edge_value(const T& vertex1, const T& vertex2, const double weight) {
-        if (!_vertices2ids.contains(vertex1) || !_vertices2ids.contains(vertex2)) {
-            throw VertexNotFoundException("Vertex not found");
-        }
-        const size_t id1 = _vertices2ids.at(vertex1);
-        const size_t id2 = _vertices2ids.at(vertex2);
-        _adj_matrix[id1 * size() + id2] = weight;
-    }
 };
 
 template <typename T>
-class GraphIncidenceMatrix final : public Graph<T> {
+class GraphIncidenceMatrix : public Graph<T> {
 private:
+    // NOLINTBEGIN(misc-non-private-member-variables-in-classes)
     struct Vertex {
         T _value;
         bool _visited = false;
-
-        Vertex() : _value() {}
+        Vertex() : _value(T{}) {}
         explicit Vertex(const T& value) : _value(value) {}
     };
+    // NOLINTEND(misc-non-private-member-variables-in-classes)
 
     std::unordered_map<T, size_t> _vertices2ids;
     std::unordered_map<size_t, Vertex> _vertices;
     size_t _edgeCount = 0;
-    double* _inc_matrix = nullptr;
+
+    // (weight, outgoing edge)
+    std::unique_ptr<std::pair<double, bool>[]> _inc_matrix = nullptr;
 public:
     // constructor
     GraphIncidenceMatrix() = default;
 
     // copy constructor
-    GraphIncidenceMatrix(const GraphIncidenceMatrix& other) : _vertices2ids(other._vertices2ids), _vertices(other._vertices), _edgeCount(other._edgeCount), _inc_matrix(static_cast<double*>(malloc(other.size() * other.edge_count() * sizeof(double)))) {
-        if (_inc_matrix == nullptr) {
-            throw std::bad_alloc();
-        }
-        std::copy(other._inc_matrix, other._inc_matrix + other.size() * other.edge_count(), _inc_matrix);
+    GraphIncidenceMatrix(const GraphIncidenceMatrix& other) : _vertices2ids(other._vertices2ids), _vertices(other._vertices), _edgeCount(other._edgeCount), _inc_matrix(std::make_unique<std::pair<double, bool>[]>(other.size() * other.edge_count())) {
+        std::copy(other._inc_matrix.get(), other._inc_matrix.get() + other.size() * other.edge_count(), _inc_matrix.get());
     }
 
     // move constructor
-    GraphIncidenceMatrix(GraphIncidenceMatrix&& other) noexcept : _vertices2ids(std::move(other._vertices2ids)), _vertices(std::move(other._vertices)), _edgeCount(other._edgeCount), _inc_matrix(other._inc_matrix) {
-        other._inc_matrix = nullptr;
-        other._edgeCount = 0;
-    }
+    // NOLINTNEXTLINE(bugprone-exception-escape)
+    GraphIncidenceMatrix(GraphIncidenceMatrix&& other) noexcept : _vertices2ids(std::move(other._vertices2ids)), _vertices(std::move(other._vertices)), _edgeCount(other._edgeCount), _inc_matrix(std::move(other._inc_matrix)) {}
 
     // copy assignment
     GraphIncidenceMatrix& operator=(const GraphIncidenceMatrix& other) {
@@ -600,12 +642,8 @@ public:
         _vertices2ids = other._vertices2ids;
         _vertices = other._vertices;
         _edgeCount = other._edgeCount;
-        free(_inc_matrix);
-        _inc_matrix = static_cast<double*>(malloc(other.size() * other.edge_count() * sizeof(double)));
-        if (_inc_matrix == nullptr) {
-            throw std::bad_alloc();
-        }
-        std::copy(other._inc_matrix, other._inc_matrix + other.size() * other.edge_count(), _inc_matrix);
+        _inc_matrix = std::make_unique<std::pair<double, bool>[]>(other.size() * other.edge_count());
+        std::copy(other._inc_matrix.get(), other._inc_matrix.get() + other.size() * other.edge_count(), _inc_matrix.get());
         return *this;
     }
 
@@ -617,21 +655,16 @@ public:
         _vertices2ids = std::move(other._vertices2ids);
         _vertices = std::move(other._vertices);
         _edgeCount = other._edgeCount;
-        free(_inc_matrix);
-        _inc_matrix = other._inc_matrix;
-        other._inc_matrix = nullptr;
-        other._edgeCount = 0;
+        _inc_matrix = std::move(other._inc_matrix);
         return *this;
     }
 
     // destructor
-    ~GraphIncidenceMatrix() override {
-        free(_inc_matrix);
-    }
+    ~GraphIncidenceMatrix() override = default;
 
     /**
-     * Get the number of edges in the graph
-     * @return the number of edges in the graph
+     * Get the number of edges in the graph.
+     * @return The number of edges in the graph.
      */
     [[nodiscard]] size_t edge_count() const {
         return _edgeCount;
@@ -642,29 +675,42 @@ public:
     }
 
     [[nodiscard]] bool adjacent(const T& vertex1, const T& vertex2) const override {
-        if (!_vertices2ids.contains(vertex1) || !_vertices2ids.contains(vertex2)) {
-            throw VertexNotFoundException("Vertex not found");
+        size_t id1 = 0;
+        size_t id2 = 0;
+        try {
+            id1 = _vertices2ids.at(vertex1);
+        } catch (const std::out_of_range& _) {
+            throw VertexNotFoundException("vertex1 not found");
         }
-        const size_t id1 = _vertices2ids.at(vertex1);
-        const size_t id2 = _vertices2ids.at(vertex2);
-        for (size_t j = 0; j < _edgeCount; j++) {
-            if (_inc_matrix[id1 * _edgeCount + j] > 0 && _inc_matrix[id2 * _edgeCount + j] < 0) {
+        try {
+            id2 = _vertices2ids.at(vertex2);
+        } catch (const std::out_of_range& _) {
+            throw VertexNotFoundException("vertex2 not found");
+        }
+
+        for (size_t j = 0; j < edge_count(); j++) {
+            if (_inc_matrix[j * size() + id1].second && !_inc_matrix[j * size() + id2].second &&
+                _inc_matrix[j * size() + id1].first == _inc_matrix[j * size() + id2].first &&
+                _inc_matrix[j * size() + id1].first != 0.0) {
                 return true;
             }
         }
         return false;
     }
 
-    [[nodiscard]] std::vector<T> neighbours(const T& vertex) const override {
-        if (!_vertices2ids.contains(vertex)) {
-            throw VertexNotFoundException("Vertex not found");
+    [[nodiscard]] std::vector<T> neighbors(const T& vertex) const override {
+        size_t id = 0;
+        try {
+            id = _vertices2ids.at(vertex);
+        } catch (const std::out_of_range& _) {
+            throw VertexNotFoundException("vertex not found");
         }
         std::vector<T> neighboursVec;
-        const size_t id = _vertices2ids.at(vertex);
-        for (size_t j = 0; j < _edgeCount; j++) {
-            if (_inc_matrix[id * _edgeCount + j] > 0) {
+        for (size_t j = 0; j < edge_count(); j++) {
+            if (_inc_matrix[j * size() + id].second && _inc_matrix[j * size() + id].first != 0.0) {
                 for (size_t i = 0; i < size(); i++) {
-                    if (_inc_matrix[i * _edgeCount + j] < 0) {
+                    if (!_inc_matrix[j * size() + i].second &&
+                        _inc_matrix[j * size() + i].first == _inc_matrix[j * size() + id].first) {
                         neighboursVec.push_back(_vertices.at(i)._value);
                         break;
                     }
@@ -676,32 +722,29 @@ public:
 
     void add_vertex(const T& vertex) override {
         if (_vertices2ids.contains(vertex)) {
-            throw VertexAlreadyExistsException("Vertex already exists");
+            throw VertexAlreadyExistsException("vertex already exists");
         }
-        const size_t id = _vertices.size();
-        _vertices2ids[vertex] = id;
-        _vertices[id] = Vertex{vertex};
-        const size_t newMatSize = size() * _edgeCount * sizeof(double);
-        if (newMatSize != 0) {
-            _inc_matrix = static_cast<double*>(realloc(_inc_matrix, newMatSize));
-            if (_inc_matrix == nullptr) {
-                throw std::bad_alloc();
-            }
-            // zero the new row
-            for (size_t j = 0; j < _edgeCount; j++) {
-                _inc_matrix[id * _edgeCount + j] = 0;
-            }
-        } else {
-            free(_inc_matrix);
-            _inc_matrix = nullptr;
+        const size_t oldSize = size();
+        _vertices2ids[vertex] = oldSize;
+        _vertices[oldSize] = Vertex{vertex};
+        auto newIncMatrix = std::make_unique<std::pair<double, bool>[]>(size() * edge_count());
+
+        for (size_t j = 0; j < edge_count(); j++) {
+            std::move(_inc_matrix.get() + j * oldSize, _inc_matrix.get() + (j + 1) * oldSize, newIncMatrix.get() + j * size());
+            newIncMatrix[(j + 1) * size() - 1] = std::pair{0.0, false};
         }
+
+        _inc_matrix = std::move(newIncMatrix);
     }
 
     void remove_vertex(const T& vertex) override {
-        if (!_vertices2ids.contains(vertex)) {
-            throw VertexNotFoundException("Vertex not found");
+        size_t id = 0;
+        try {
+            id = _vertices2ids.at(vertex);
+        } catch (const std::out_of_range& _) {
+            throw VertexNotFoundException("vertex not found");
         }
-        const size_t id = _vertices2ids.at(vertex);
+        const size_t oldSize = size();
         _vertices2ids.erase(vertex);
         _vertices.erase(id);
 
@@ -713,173 +756,146 @@ public:
         }
 
         // update ids in _vertices
-        std::unordered_map<size_t, Vertex> newVertices;
-        newVertices.reserve(_vertices.size());
-        for (std::pair<const size_t, Vertex>& vertexGraph : _vertices) {
-            newVertices[vertexGraph.first < id ? vertexGraph.first : vertexGraph.first - 1] = std::move(vertexGraph.second);
+        for (size_t i = id + 1; i < oldSize; ++i) {
+            auto node = _vertices.extract(i);
+            node.key() = i - 1;
+            _vertices.insert(std::move(node));
         }
-        _vertices = std::move(newVertices);
 
-        size_t i = 0;
-        for (size_t j = 0; j < _edgeCount; j++) {
-            if (_inc_matrix[id * _edgeCount + j] == 0) {
-                for (size_t k = 0; k < size(); k++) {
-                    _inc_matrix[k * _edgeCount + i] = _inc_matrix[k * _edgeCount + j];
-                }
-                i++;
+        // update edge count
+        const size_t oldEdgeCount = edge_count();
+        for (size_t j = 0; j < oldEdgeCount; j++) {
+            if (_inc_matrix[j * oldSize + id].first != 0.0) {
+                _edgeCount--;
             }
         }
-        const size_t removed_edges = _edgeCount - i;
-        i = 0;
-        for (size_t j = 0; j < size(); j++) {
-            if (j != id) {
-                std::copy(&_inc_matrix[j * _edgeCount], &_inc_matrix[j * _edgeCount + _edgeCount - removed_edges], &_inc_matrix[i]);
-                i += _edgeCount - removed_edges;
+
+        // update incidence matrix
+        auto newIncMatrix = std::make_unique<std::pair<double, bool>[]>(size() * edge_count());
+        for (size_t i = 0, j = 0; i < oldEdgeCount; i++) {
+            if (_inc_matrix[i * oldSize + id].first == 0.0) {
+                std::move(_inc_matrix.get() + i * oldSize, _inc_matrix.get() + i * oldSize + id, newIncMatrix.get() + j);
+                j += id;
+                std::move(_inc_matrix.get() + i * oldSize + id + 1, _inc_matrix.get() + (i + 1) * oldSize, newIncMatrix.get() + j);
+                j += oldSize - id - 1;
             }
         }
-        _edgeCount -= removed_edges;
-
-        const size_t newMatSize = size() * _edgeCount * sizeof(double);
-        if (newMatSize != 0) {
-            _inc_matrix = static_cast<double*>(realloc(_inc_matrix, newMatSize));
-            if (_inc_matrix == nullptr) {
-                throw std::bad_alloc();
-            }
-        } else {
-            free(_inc_matrix);
-            _inc_matrix = nullptr;
-        }
+        _inc_matrix = std::move(newIncMatrix);
     }
 
-    void add_edge(const T& vertex1, const T& vertex2) override {
-        if (adjacent(vertex1, vertex2)) {
-            throw EdgeAlreadyExistsException("Edge already exists");
+    [[nodiscard]] bool get_vertex_visited(const T& vertex) const override {
+        try {
+            const size_t id = _vertices2ids.at(vertex);
+            return _vertices.at(id)._visited;
+        } catch (const std::out_of_range& _) {
+            throw VertexNotFoundException("vertex not found");
         }
-        set_edge_value(vertex1, vertex2, 1);
-    }
-
-    void remove_edge(const T& vertex1, const T& vertex2) override {
-        if (!adjacent(vertex1, vertex2)) {
-            throw EdgeNotFoundException("Edge not found");
-        }
-        set_edge_value(vertex1, vertex2, 0);
-    }
-
-    [[nodiscard]] bool vertex_visited(const T& vertex) const override {
-        if (!_vertices2ids.contains(vertex)) {
-            throw VertexNotFoundException("Vertex not found");
-        }
-        return _vertices.at(_vertices2ids.at(vertex))._visited;
     }
 
     void set_vertex_visited(const T& vertex, bool visited) override {
-        if (!_vertices2ids.contains(vertex)) {
-            throw VertexNotFoundException("Vertex not found");
+        try {
+            _vertices.at(_vertices2ids.at(vertex))._visited = visited;
+        } catch (const std::out_of_range& _) {
+            throw VertexNotFoundException("vertex not found");
         }
-        _vertices.at(_vertices2ids.at(vertex))._visited = visited;
     }
 
     void reset_vertices_visited() override {
-        for (const std::pair<const size_t, Vertex>& pair : _vertices) {
-            _vertices[pair.first]._visited = false;
+        for (std::pair<const size_t, Vertex>& vertex : _vertices) {
+            vertex.second._visited = false;
         }
     }
 
-    /**
-     * Get the value of an edge.
-     * If weight is 0, the edge does not exist.
-     * If any of the vertices does not exist, throws a VertexNotFoundException.
-     * @param vertex1 the first vertex
-     * @param vertex2 the second vertex
-     * @return the weight of the edge (0 means no edge, 1 if not weighted)
-     */
-    [[nodiscard]] double get_edge_value(const T& vertex1, const T& vertex2) const {
-        if (!_vertices2ids.contains(vertex1) || !_vertices2ids.contains(vertex2)) {
-            throw VertexNotFoundException("Vertex not found");
+    [[nodiscard]] double get_edge_weight(const T& vertex1, const T& vertex2) const override {
+        size_t id1 = 0;
+        size_t id2 = 0;
+        try {
+            id1 = _vertices2ids.at(vertex1);
+        } catch (const std::out_of_range& _) {
+            throw VertexNotFoundException("vertex1 not found");
         }
-        const size_t id1 = _vertices2ids.at(vertex1);
-        const size_t id2 = _vertices2ids.at(vertex2);
-        for (size_t j = 0; j < _edgeCount; j++) {
-            if (_inc_matrix[id1 * _edgeCount + j] > 0 && _inc_matrix[id2 * _edgeCount + j] < 0) {
-                return _inc_matrix[id1 * _edgeCount + j];
+        try {
+            id2 = _vertices2ids.at(vertex2);
+        } catch (const std::out_of_range& _) {
+            throw VertexNotFoundException("vertex2 not found");
+        }
+        for (size_t j = 0; j < edge_count(); j++) {
+            if (_inc_matrix[j * size() + id1].second && !_inc_matrix[j * size() + id2].second &&
+                _inc_matrix[j * size() + id1].first == _inc_matrix[j * size() + id2].first &&
+                _inc_matrix[j * size() + id1].first != 0.0) {
+                return _inc_matrix[j * size() + id1].first;
             }
         }
         return 0;
     }
 
-    /**
-     * Set the value of an edge.
-     * If weight is 0, the edge is removed.
-     * If any of the vertices does not exist, throws a VertexNotFoundException.
-     * @param vertex1 the first vertex
-     * @param vertex2 the second vertex
-     * @param weight the weight of the edge (0 means no edge)
-     */
-    void set_edge_value(const T& vertex1, const T& vertex2, const double weight) {
-        if (!_vertices2ids.contains(vertex1) || !_vertices2ids.contains(vertex2)) {
-            throw VertexNotFoundException("Vertex not found");
+    void set_edge_weight(const T& vertex1, const T& vertex2, const double weight) override {
+        size_t id1 = 0;
+        size_t id2 = 0;
+        try {
+            id1 = _vertices2ids.at(vertex1);
+        } catch (const std::out_of_range& _) {
+            throw VertexNotFoundException("vertex1 not found");
         }
-        const size_t id1 = _vertices2ids.at(vertex1);
-        const size_t id2 = _vertices2ids.at(vertex2);
+        try {
+            id2 = _vertices2ids.at(vertex2);
+        } catch (const std::out_of_range& _) {
+            throw VertexNotFoundException("vertex2 not found");
+        }
 
-        // if weight is 0, remove edge if it is present
+        // if the weight is 0, remove the edge if it is present
         if (weight == 0) {
-            size_t i = 0;
-            for (size_t j = 0; j < _edgeCount; j++) {
-                if (_inc_matrix[id1 * _edgeCount + j] <= 0 && _inc_matrix[id2 * _edgeCount + j] >= 0) {
-                    for (size_t k = 0; k < size(); k++) {
-                        _inc_matrix[k * _edgeCount + i] = _inc_matrix[k * _edgeCount + j];
+            bool is_present = false;
+            size_t edge_id = 0;
+            for (size_t i = 0; i < edge_count(); i++) {
+                if (_inc_matrix[i * size() + id1].second && !_inc_matrix[i * size() + id2].second &&
+                    _inc_matrix[i * size() + id1].first == _inc_matrix[i * size() + id2].first &&
+                    _inc_matrix[i * size() + id1].first != 0.0) {
+                    is_present = true;
+                    edge_id = i;
+                    break;
+                }
+            }
+            if (is_present) {
+                const size_t oldEdgeCount = edge_count();
+                _edgeCount--;
+                auto newIncMatrix = std::make_unique<std::pair<double, bool>[]>(size() * edge_count());
+                for (size_t i = 0, j = 0; i < oldEdgeCount; i++) {
+                    if (i != edge_id) {
+                        std::move(_inc_matrix.get() + i * size(), _inc_matrix.get() + (i + 1) * size(), newIncMatrix.get() + j);
+                        j += size();
                     }
-                    i++;
                 }
-            }
-            const size_t removed_edges = _edgeCount - i;
-            if (removed_edges == 1) {
-                i = 0;
-                for (size_t j = 0; j < size(); j++) {
-                    std::copy(&_inc_matrix[j * _edgeCount], &_inc_matrix[(j + 1) * _edgeCount - removed_edges], &_inc_matrix[i]);
-                    i += _edgeCount - removed_edges;
-                }
-                _edgeCount -= removed_edges;
-            }
-            return;
-        }
-
-        // update edge if it is already in the incidence matrix
-        for (size_t j = 0; j < _edgeCount; j++) {
-            if (_inc_matrix[id1 * _edgeCount + j] > 0 && _inc_matrix[id2 * _edgeCount + j] < 0) {
-                _inc_matrix[id1 * _edgeCount + j] = weight;
-                _inc_matrix[id2 * _edgeCount + j] = -weight;
-                return;
-            }
-        }
-
-        // if edge is not in incidence matrix
-        _edgeCount++;
-        const size_t newMatSize = size() * _edgeCount * sizeof(double);
-        if (newMatSize != 0) {
-            _inc_matrix = static_cast<double*>(realloc(_inc_matrix, newMatSize));
-            if (_inc_matrix == nullptr) {
-                throw std::bad_alloc();
+                _inc_matrix = std::move(newIncMatrix);
             }
         } else {
-            free(_inc_matrix);
-            _inc_matrix = nullptr;
-        }
-
-        // copy old data to new positions
-        for (size_t i = size() - 1; i != static_cast<size_t>(-1); --i) {
-            for (size_t j = _edgeCount - 2; j != static_cast<size_t>(-1); --j) {
-                _inc_matrix[i * _edgeCount + j] = _inc_matrix[i * (_edgeCount - 1) + j];
+            // if the weight is not zero, the edge must be either updated or added to the incidence matrix
+            bool is_present = false;
+            for (size_t i = 0; i < edge_count(); i++) {
+                if (_inc_matrix[i * size() + id1].second && !_inc_matrix[i * size() + id2].second &&
+                    _inc_matrix[i * size() + id1].first == _inc_matrix[i * size() + id2].first &&
+                    _inc_matrix[i * size() + id1].first != 0.0) {
+                        is_present = true;
+                        _inc_matrix[i * size() + id1].first = _inc_matrix[i * size() + id2].first = weight;
+                        break;
+                    }
+            }
+            if (!is_present) {
+                // if the edge is not present, it must be added
+                const size_t oldEdgeCount = edge_count();
+                _edgeCount++;
+                auto newIncMatrix = std::make_unique<std::pair<double, bool>[]>(size() * edge_count());
+                std::move(_inc_matrix.get(), _inc_matrix.get() + oldEdgeCount * size(), newIncMatrix.get());
+                std::fill(
+                    newIncMatrix.get() + oldEdgeCount * size(),
+                    newIncMatrix.get() + edge_count() * size(),
+                    std::pair{0.0, false}
+                    );
+                newIncMatrix[oldEdgeCount * size() + id1] = std::pair{weight, true};
+                newIncMatrix[oldEdgeCount * size() + id2] = std::pair{weight, false};
+                _inc_matrix = std::move(newIncMatrix);
             }
         }
-        // set new column to 0
-        for (size_t i = 0; i < size(); i++) {
-            _inc_matrix[i * _edgeCount + _edgeCount - 1] = 0;
-        }
-        // set new edge
-        _inc_matrix[id1 * _edgeCount + _edgeCount - 1] = weight;
-        _inc_matrix[id2 * _edgeCount + _edgeCount - 1] = -weight;
     }
 };
 

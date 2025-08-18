@@ -5,6 +5,7 @@
 #include <utility>
 #include <vector>
 
+// NOLINTBEGIN(bugprone-exception-escape)
 int main(const int argc, char *argv[]) {
     if (argc != 2) {
         return -2;
@@ -49,6 +50,7 @@ int main(const int argc, char *argv[]) {
 
     return test_result ? 0 : -1;
 }
+// NOLINTEND(bugprone-exception-escape)
 
 bool test_GraphAdjacencyList1() {
     // Test constructors, destructors, and assignment operators
@@ -125,13 +127,13 @@ bool test_GraphAdjacencyList4() {
     graph.add_edge(1, 2);
     graph.add_edge(2, 4);
     graph.add_edge(1, 4);
-    auto neighbours1 = graph.neighbours(1);
+    auto neighbours1 = graph.neighbors(1);
     std::ranges::sort(neighbours1);
     const std::vector<int> expectedNeighbours1{2, 4};
     if (neighbours1 != expectedNeighbours1) {
         return false;
     }
-    const auto neighbours2 = graph.neighbours(2);
+    const auto neighbours2 = graph.neighbors(2);
     const std::vector<int> expectedNeighbours2{4};
     return neighbours2 == expectedNeighbours2;
 }
@@ -141,17 +143,17 @@ bool test_GraphAdjacencyList5() {
     GraphAdjacencyList<int> graph;
     graph.add_vertex(1);
     graph.set_vertex_visited(1, true);
-    if (!graph.vertex_visited(1)) {
+    if (!graph.get_vertex_visited(1)) {
         return false;
     }
     graph.set_vertex_visited(1, false);
     graph.add_vertex(2);
     graph.set_vertex_visited(2, true);
-    if (!graph.vertex_visited(2) || graph.vertex_visited(1)) {
+    if (!graph.get_vertex_visited(2) || graph.get_vertex_visited(1)) {
         return false;
     }
     graph.reset_vertices_visited();
-    return !graph.vertex_visited(1) && !graph.vertex_visited(2);
+    return !graph.get_vertex_visited(1) && !graph.get_vertex_visited(2);
 }
 
 bool test_GraphAdjacencyMatrix1() {
@@ -210,10 +212,14 @@ bool test_GraphAdjacencyMatrix3() {
     if (!graph.adjacent(1, 2) || graph.adjacent(2, 1)) { return false; }
     graph.add_edge(2, 1);
     if (!graph.adjacent(1, 2) || !graph.adjacent(2, 1)) { return false; }
+    graph.add_vertex(3);
+    if (graph.adjacent(1, 3) || graph.adjacent(3, 1) || graph.adjacent(2, 3) || graph.adjacent(3, 2)) {
+        return false;
+    }
     graph.remove_edge(1, 2);
     if (graph.adjacent(1, 2) || !graph.adjacent(2, 1)) { return false; }
-    graph.remove_edge(2, 1);
-    return !graph.adjacent(1, 2) && !graph.adjacent(2, 1);
+    graph.remove_vertex(2);
+    return !graph.adjacent(1, 3) && !graph.adjacent(3, 1);
 }
 
 bool test_GraphAdjacencyMatrix4() {
@@ -225,13 +231,13 @@ bool test_GraphAdjacencyMatrix4() {
     graph.add_edge(1, 2);
     graph.add_edge(2, 4);
     graph.add_edge(1, 4);
-    auto neighbours1 = graph.neighbours(1);
+    auto neighbours1 = graph.neighbors(1);
     std::ranges::sort(neighbours1);
     const std::vector<int> expectedNeighbours1{2, 4};
     if (neighbours1 != expectedNeighbours1) {
         return false;
     }
-    const auto neighbours2 = graph.neighbours(2);
+    const auto neighbours2 = graph.neighbors(2);
     const std::vector<int> expectedNeighbours2{4};
     return neighbours2 == expectedNeighbours2;
 }
@@ -241,17 +247,17 @@ bool test_GraphAdjacencyMatrix5() {
     GraphAdjacencyMatrix<int> graph;
     graph.add_vertex(1);
     graph.set_vertex_visited(1, true);
-    if (!graph.vertex_visited(1)) {
+    if (!graph.get_vertex_visited(1)) {
         return false;
     }
     graph.set_vertex_visited(1, false);
     graph.add_vertex(2);
     graph.set_vertex_visited(2, true);
-    if (!graph.vertex_visited(2) || graph.vertex_visited(1)) {
+    if (!graph.get_vertex_visited(2) || graph.get_vertex_visited(1)) {
         return false;
     }
     graph.reset_vertices_visited();
-    return !graph.vertex_visited(1) && !graph.vertex_visited(2);
+    return !graph.get_vertex_visited(1) && !graph.get_vertex_visited(2);
 }
 
 bool test_GraphIncidenceMatrix1() {
@@ -310,10 +316,14 @@ bool test_GraphIncidenceMatrix3() {
     if (!graph.adjacent(1, 2) || graph.adjacent(2, 1)) { return false; }
     graph.add_edge(2, 1);
     if (!graph.adjacent(1, 2) || !graph.adjacent(2, 1)) { return false; }
+    graph.add_vertex(3);
+    if (graph.adjacent(1, 3) || graph.adjacent(3, 1) || graph.adjacent(2, 3) || graph.adjacent(3, 2)) {
+        return false;
+    }
     graph.remove_edge(1, 2);
     if (graph.adjacent(1, 2) || !graph.adjacent(2, 1)) { return false; }
-    graph.remove_edge(2, 1);
-    return !graph.adjacent(1, 2) && !graph.adjacent(2, 1);
+    graph.remove_vertex(2);
+    return !graph.adjacent(1, 3) && !graph.adjacent(3, 1);
 }
 
 bool test_GraphIncidenceMatrix4() {
@@ -325,13 +335,13 @@ bool test_GraphIncidenceMatrix4() {
     graph.add_edge(1, 2);
     graph.add_edge(2, 4);
     graph.add_edge(1, 4);
-    auto neighbours1 = graph.neighbours(1);
+    auto neighbours1 = graph.neighbors(1);
     std::ranges::sort(neighbours1);
     const std::vector<int> expectedNeighbours1{2, 4};
     if (neighbours1 != expectedNeighbours1) {
         return false;
     }
-    const auto neighbours2 = graph.neighbours(2);
+    const auto neighbours2 = graph.neighbors(2);
     const std::vector<int> expectedNeighbours2{4};
     return neighbours2 == expectedNeighbours2;
 }
@@ -341,15 +351,15 @@ bool test_GraphIncidenceMatrix5() {
     GraphIncidenceMatrix<int> graph;
     graph.add_vertex(1);
     graph.set_vertex_visited(1, true);
-    if (!graph.vertex_visited(1)) {
+    if (!graph.get_vertex_visited(1)) {
         return false;
     }
     graph.set_vertex_visited(1, false);
     graph.add_vertex(2);
     graph.set_vertex_visited(2, true);
-    if (!graph.vertex_visited(2) || graph.vertex_visited(1)) {
+    if (!graph.get_vertex_visited(2) || graph.get_vertex_visited(1)) {
         return false;
     }
     graph.reset_vertices_visited();
-    return !graph.vertex_visited(1) && !graph.vertex_visited(2);
+    return !graph.get_vertex_visited(1) && !graph.get_vertex_visited(2);
 }
