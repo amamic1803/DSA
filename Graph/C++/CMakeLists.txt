@@ -4,12 +4,18 @@ project(Graph CXX)
 
 set(CMAKE_C_STANDARD 23)
 set(CMAKE_C_STANDARD_REQUIRED ON)
+set(CMAKE_C_EXTENSIONS OFF)
+
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
-set(CMAKE_C_CLANG_TIDY clang-tidy)
-set(CMAKE_CXX_CLANG_TIDY clang-tidy)
+find_program(CLANG_TIDY_EXE NAMES clang-tidy REQUIRED)
+set(CMAKE_C_CLANG_TIDY "${CLANG_TIDY_EXE};--config-file=${CMAKE_SOURCE_DIR}/../../.clang-tidy")
+set(CMAKE_CXX_CLANG_TIDY "${CLANG_TIDY_EXE};--config-file=${CMAKE_SOURCE_DIR}/../../.clang-tidy")
+
 include(CTest)
+
 
 # Add the library
 add_library(graph_lib STATIC
@@ -22,6 +28,9 @@ set_target_properties(graph_lib PROPERTIES
         OUTPUT_NAME graph_lib
         PUBLIC_HEADER src/lib/include/graph.hpp
 )
+target_compile_options(graph_lib PRIVATE
+        $<$<CXX_COMPILER_ID:GNU,Clang>:-Wall -Wextra -Wpedantic -Werror>
+)
 
 # Add the tests
 add_executable(graph_tests src/tests/tests.hpp src/tests/tests.cpp)
@@ -33,6 +42,10 @@ set_target_properties(graph_tests PROPERTIES
         OUTPUT_NAME graph_tests
         RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests
 )
+target_compile_options(graph_tests PRIVATE
+        $<$<CXX_COMPILER_ID:GNU,Clang>:-Wall -Wextra -Wpedantic -Werror>
+)
+
 add_test(NAME test_GraphAdjacencyList1 COMMAND graph_tests GraphAdjacencyList1)
 add_test(NAME test_GraphAdjacencyList2 COMMAND graph_tests GraphAdjacencyList2)
 add_test(NAME test_GraphAdjacencyList3 COMMAND graph_tests GraphAdjacencyList3)

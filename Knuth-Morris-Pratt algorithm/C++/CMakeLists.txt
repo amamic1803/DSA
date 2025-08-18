@@ -4,12 +4,18 @@ project(KnuthMorrisPratt CXX)
 
 set(CMAKE_C_STANDARD 23)
 set(CMAKE_C_STANDARD_REQUIRED ON)
+set(CMAKE_C_EXTENSIONS OFF)
+
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
-set(CMAKE_C_CLANG_TIDY clang-tidy)
-set(CMAKE_CXX_CLANG_TIDY clang-tidy)
+find_program(CLANG_TIDY_EXE NAMES clang-tidy REQUIRED)
+set(CMAKE_C_CLANG_TIDY "${CLANG_TIDY_EXE};--config-file=${CMAKE_SOURCE_DIR}/../../.clang-tidy")
+set(CMAKE_CXX_CLANG_TIDY "${CLANG_TIDY_EXE};--config-file=${CMAKE_SOURCE_DIR}/../../.clang-tidy")
+
 include(CTest)
+
 
 # Add the library
 add_library(knuth_morris_pratt_lib STATIC
@@ -23,6 +29,9 @@ set_target_properties(knuth_morris_pratt_lib PROPERTIES
         OUTPUT_NAME knuth_morris_pratt_lib
         PUBLIC_HEADER src/lib/include/knuth_morris_pratt.hpp
 )
+target_compile_options(knuth_morris_pratt_lib PRIVATE
+        $<$<CXX_COMPILER_ID:GNU,Clang>:-Wall -Wextra -Wpedantic -Werror>
+)
 
 # Add the tests
 add_executable(knuth_morris_pratt_tests src/tests/tests.hpp src/tests/tests.cpp)
@@ -33,6 +42,9 @@ set_target_properties(knuth_morris_pratt_tests PROPERTIES
         LINKER_LANGUAGE CXX
         OUTPUT_NAME knuth_morris_pratt_tests
         RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests
+)
+target_compile_options(knuth_morris_pratt_tests PRIVATE
+        $<$<CXX_COMPILER_ID:GNU,Clang>:-Wall -Wextra -Wpedantic -Werror>
 )
 add_test(NAME test_1 COMMAND knuth_morris_pratt_tests 1)
 add_test(NAME test_2 COMMAND knuth_morris_pratt_tests 2)

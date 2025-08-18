@@ -11,40 +11,41 @@ int main(const int argc, char *argv[]) {
     }
 
     const std::string arg(argv[1]);
-    bool test_result;
+    bool test_result = false;
 
-    if (arg == "GraphAdjacencyList1")
+    if (arg == "GraphAdjacencyList1") {
         test_result = test_GraphAdjacencyList1();
-    else if (arg == "GraphAdjacencyList2")
+    } else if (arg == "GraphAdjacencyList2") {
         test_result = test_GraphAdjacencyList2();
-    else if (arg == "GraphAdjacencyList3")
+    } else if (arg == "GraphAdjacencyList3") {
         test_result = test_GraphAdjacencyList3();
-    else if (arg == "GraphAdjacencyList4")
+    } else if (arg == "GraphAdjacencyList4") {
         test_result = test_GraphAdjacencyList4();
-    else if (arg == "GraphAdjacencyList5")
+    } else if (arg == "GraphAdjacencyList5") {
         test_result = test_GraphAdjacencyList5();
-    else if (arg == "GraphAdjacencyMatrix1")
+    } else if (arg == "GraphAdjacencyMatrix1") {
         test_result = test_GraphAdjacencyMatrix1();
-    else if (arg == "GraphAdjacencyMatrix2")
+    } else if (arg == "GraphAdjacencyMatrix2") {
         test_result = test_GraphAdjacencyMatrix2();
-    else if (arg == "GraphAdjacencyMatrix3")
+    } else if (arg == "GraphAdjacencyMatrix3") {
         test_result = test_GraphAdjacencyMatrix3();
-    else if (arg == "GraphAdjacencyMatrix4")
+    } else if (arg == "GraphAdjacencyMatrix4") {
         test_result = test_GraphAdjacencyMatrix4();
-    else if (arg == "GraphAdjacencyMatrix5")
+    } else if (arg == "GraphAdjacencyMatrix5") {
         test_result = test_GraphAdjacencyMatrix5();
-    else if (arg == "GraphIncidenceMatrix1")
+    } else if (arg == "GraphIncidenceMatrix1") {
         test_result = test_GraphIncidenceMatrix1();
-    else if (arg == "GraphIncidenceMatrix2")
+    } else if (arg == "GraphIncidenceMatrix2") {
         test_result = test_GraphIncidenceMatrix2();
-    else if (arg == "GraphIncidenceMatrix3")
+    } else if (arg == "GraphIncidenceMatrix3") {
         test_result = test_GraphIncidenceMatrix3();
-    else if (arg == "GraphIncidenceMatrix4")
+    } else if (arg == "GraphIncidenceMatrix4") {
         test_result = test_GraphIncidenceMatrix4();
-    else if (arg == "GraphIncidenceMatrix5")
+    } else if (arg == "GraphIncidenceMatrix5") {
         test_result = test_GraphIncidenceMatrix5();
-    else
+    } else {
         return -3;
+    }
 
     return test_result ? 0 : -1;
 }

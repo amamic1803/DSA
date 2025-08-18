@@ -195,8 +195,9 @@ public:
 
     // copy assignment
     GraphAdjacencyList& operator=(const GraphAdjacencyList& other) {
-        if (this == &other)
+        if (this == &other) {
             return *this;
+    }
         _vertices2ids = other._vertices2ids;
         _vertices = other._vertices;
         return *this;
@@ -204,8 +205,9 @@ public:
 
     // move assignment
     GraphAdjacencyList& operator=(GraphAdjacencyList&& other) noexcept {
-        if (this == &other)
+        if (this == &other) {
             return *this;
+        }
         _vertices2ids = std::move(other._vertices2ids);
         _vertices = std::move(other._vertices);
         return *this;
@@ -592,8 +594,9 @@ public:
 
     // copy assignment
     GraphIncidenceMatrix& operator=(const GraphIncidenceMatrix& other) {
-        if (this == &other)
+        if (this == &other) {
             return *this;
+        }
         _vertices2ids = other._vertices2ids;
         _vertices = other._vertices;
         _edgeCount = other._edgeCount;
@@ -608,8 +611,9 @@ public:
 
     // move assignment
     GraphIncidenceMatrix& operator=(GraphIncidenceMatrix&& other) noexcept {
-        if (this == &other)
+        if (this == &other) {
             return *this;
+        }
         _vertices2ids = std::move(other._vertices2ids);
         _vertices = std::move(other._vertices);
         _edgeCount = other._edgeCount;

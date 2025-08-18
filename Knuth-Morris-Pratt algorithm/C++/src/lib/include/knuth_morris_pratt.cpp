@@ -2,66 +2,65 @@
 #include <cstddef>
 #include <memory>
 #include <string>
+#include <vector>
 
 
 namespace {
-    size_t longestPrefixSuffix(const std::string& pattern, const size_t size) {
-        size_t longest = 0;
+    std::unique_ptr<std::size_t[]> createLPS(const std::string& pattern) {
+        const std::size_t m = pattern.size();
 
-        for (size_t length = 1; length < size; length++) {
-            size_t i;
-            for (i = 0; i < length; i++) {
-                if (pattern[i] != pattern[size - length + i]) {
-                    break;
+        auto lps = std::make_unique<std::size_t[]>(m);
+        lps[0] = 0;
+        std::size_t i = 1;
+        std::size_t len = 0;
+
+        while (i < m) {
+            if (pattern[i] == pattern[len]) {
+                lps[i++] = ++len;
+            } else {
+                if (len != 0) {
+                    len = lps[len - 1];
+                } else {
+                    lps[i++] = 0;
                 }
             }
-            if (i == length) {
-                longest = length;
-            }
-        }
-
-        return longest;
-    }
-
-    std::unique_ptr<size_t[]> createLPS(const std::string& pattern) {
-        auto lps = std::make_unique<size_t[]>(pattern.size());
-
-        for (size_t size = 1; size <= pattern.size(); size++) {
-            lps[size - 1] = longestPrefixSuffix(pattern, size);
         }
 
         return lps;
     }
-}
+}  // namespace
 
 
-int searchKnuthMorrisPratt(const std::string& text, const std::string& pattern) {
-    const size_t n = text.size();
-    const size_t m = pattern.size();
+std::vector<std::size_t> searchKMP(const std::string& text, const std::string& pattern) {
+    const std::size_t n = text.size();
+    const std::size_t m = pattern.size();
 
-    if (n == 0 || m == 0 || n < m) {
-        return -1;
+    if (m == 0) {
+        return {0};
     }
 
-    const std::unique_ptr<size_t[]> lps = createLPS(pattern);
+    const auto lps = createLPS(pattern);
+    std::vector<std::size_t> matches;
+    std::size_t i = 0;
+    std::size_t j = 0;
 
-    size_t i = 0;
-    while (i <= n - m) {
-        size_t j;
-        for (j = 0; j < m; j++) {
-            if (text[i + j] != pattern[j]) {
-                break;
+    while (i + (m - j) <= n) {
+        if (text[i] == pattern[j]) {
+            i++;
+            j++;
+
+            if (j == m) {
+                matches.push_back(i - j);
+                j = lps[j - 1];
+            }
+        } else {
+            if (j != 0) {
+                j = lps[j - 1];
+            } else {
+                i++;
             }
         }
-        if (j == m) {
-            return static_cast<int>(i);
-        }
-        if (j == 0) {
-            i++;
-        } else {
-            i += j - lps[j - 1];
-        }
     }
 
-    return -1;
+    return matches;
 }

@@ -1,14 +1,17 @@
 #include "knuth_morris_pratt.hpp"
 #include "tests.hpp"
+#include <cstddef>
 #include <stdexcept>
 #include <string>
+#include <vector>
 
+// NOLINTBEGIN(bugprone-exception-escape)
 int main(const int argc, char *argv[]) {
     if (argc != 2) {
         return -2;
     }
 
-    int problem_number;
+    int problem_number = 0;
     try {
         problem_number = std::stoi(argv[1]);
     } catch (std::invalid_argument &_) {
@@ -19,7 +22,7 @@ int main(const int argc, char *argv[]) {
         return -5;
     }
 
-    bool test_result;
+    bool test_result = false;
     switch (problem_number) {
         case 1:
             test_result = test_1();
@@ -57,43 +60,64 @@ int main(const int argc, char *argv[]) {
 
     return test_result ? 0 : -1;
 }
+// NOLINTEND(bugprone-exception-escape)
 
 bool test_1() {
-    return searchKnuthMorrisPratt("", "") == -1;
+    const std::vector<std::size_t> expected{0};
+    const std::vector<std::size_t> result = searchKMP("", "");
+    return result == expected;
 }
 
 bool test_2() {
-    return searchKnuthMorrisPratt("", "pattern") == -1;
+    const std::vector<std::size_t> expected;
+    const std::vector<std::size_t> result = searchKMP("", "pattern");
+    return result == expected;
 }
 
 bool test_3() {
-    return searchKnuthMorrisPratt("text", "") == -1;
+    const std::vector<std::size_t> expected{0};
+    const std::vector<std::size_t> result = searchKMP("text", "");
+    return result == expected;
 }
 
 bool test_4() {
-    return searchKnuthMorrisPratt("short", "longerpattern") == -1;
+    const std::vector<std::size_t> expected;
+    const std::vector<std::size_t> result = searchKMP("short", "longerpattern");
+    return expected == result;
 }
 
 bool test_5() {
-    return searchKnuthMorrisPratt("pattern", "pattern") == 0;
+    const std::vector<std::size_t> expected{0};
+    const std::vector<std::size_t> result = searchKMP("pattern", "pattern");
+    return result == expected;
 }
 
 bool test_6() {
-    return searchKnuthMorrisPratt("pattern in text", "pattern") == 0;
+    const std::vector<std::size_t> expected{0};
+    const std::vector<std::size_t> result = searchKMP("pattern in text", "pattern");
+    return result == expected;
 }
 
 bool test_7() {
-    return searchKnuthMorrisPratt("text with pattern", "pattern") == 10;
+    const std::vector<std::size_t> expected{10};
+    const std::vector<std::size_t> result = searchKMP("text with pattern", "pattern");
+    return result == expected;
 }
 
 bool test_8() {
-    return searchKnuthMorrisPratt("text with pattern and pattern", "pattern") == 10;
+    const std::vector<std::size_t> expected{10, 22};
+    const std::vector<std::size_t> result = searchKMP("text with pattern and pattern", "pattern");
+    return result == expected;
 }
 
 bool test_9() {
-    return searchKnuthMorrisPratt("clean text", "pattern") == -1;
+    const std::vector<std::size_t> expected;
+    const std::vector<std::size_t> result = searchKMP("clean text", "pattern");
+    return result == expected;
 }
 
 bool test_10() {
-    return searchKnuthMorrisPratt("long text with pattern in the middle", "pattern") == 15;
+    const std::vector<std::size_t> expected{15};
+    const std::vector<std::size_t> result = searchKMP("long text with pattern in the middle", "pattern");
+    return result == expected;
 }
